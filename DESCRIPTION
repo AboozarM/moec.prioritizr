@@ -23,11 +23,16 @@ Imports:
     tibble (>= 2.0.0),
     Matrix (>= 1.3-0),
     prioritizr (>= 8.0.6.8)
+Suggests:
+    testthat (>= 3.1.0),
+    knitr (>= 1.36),
+    rmarkdown (>= 2.11),
+    highs (>= 0.1-10)
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Remotes:
   prioritizr/prioritizr@multiobj
-Collate: 
+Collate:
     'internal.R'
     'add_epconstraint_approach.R'
     'prioritizr_assertions.R'

@@ -40,8 +40,7 @@ add_epconstraint_approach <- function(x, n, verbose = TRUE) {
   assert(
     is_multi_conservation_problem(x),
     assertthat::is.count(n),
-    assertthat::is.flag(n),
-    n > prioritizr::number_of_problems(x),
+    prioritizr::number_of_problems(x) == 2,
     assertthat::is.flag(verbose),
     assertthat::noNA(verbose)
   )
@@ -58,21 +57,124 @@ add_epconstraint_approach <- function(x, n, verbose = TRUE) {
           ## initialization
           n <- self$get_data("n")
           verbose <- self$get_data("verbose")
-          sols <- vector(mode = "list", length = n)
+          # sols <- vector(mode = "list", length = n)
+          sols <- vector(mode = "list", length = 2) # only for 2 extreme points
           ## preliminary calculations
           n_extra <- n - nrow(x$obj)
           ## if needed, set up progress bar
           if (isTRUE(verbose)) {
             pb <- cli::cli_progress_bar("Generating solutions", total = n)
           }
-          ## generate solutions that represent extreme points
-          for (i in seq_len(nrow(x$opt))) {
-            ### modify problem
-            x$opt$set_modelsense(x$modelsense[[i]])
-            x$opt$set_obj(x$obj[i, ])
-            ### solve problem
-            sols[[i]] <- solver$solve(x$opt)
-            ### compute and store objective values for each objective
+          print("here1")
+          ## generate solution for first extreme point
+          ### modify problem to solve with primary objective
+          x$opt$set_modelsense(x$modelsense[[1]])
+          x$opt$set_obj(x$obj[1, ])
+          ### solve problem
+          temp_sol <- solver$solve(x$opt)
+          ### modify problem to solve with secondary objective
+          x$opt$set_modelsense(x$modelsense[[2]])
+          x$opt$set_obj(x$obj[2, ])
+          x$opt$append_linear_constraints(
+            rhs = sum(x$obj[1, ] * temp_sol$x),
+            sense = ifelse(x$modelsense[[1]] == "min", "<=", ">="),
+            A = Matrix::sparseMatrix(
+              i = rep(1, ncol(x$obj)),
+              j = seq_len(ncol(x$obj)),
+              x = x$obj[1, ],
+              dims = c(1, ncol(x$obj))
+            ),
+            row_ids = "obj1"
+          )
+          ### if possible, update the starting solution for the solver
+          if (
+            !is.null(solver$data) &&
+            !is.null(temp_sol$x) &&
+            isTRUE("start_solution" %in% names(solver$data))
+          ) {
+            solver$data$start_solution <- temp_sol$x
+          }
+          ### solve problem
+          sols[[1]] <- solver$solve(x$opt)
+          ### reset problem to remove last linear constraint
+          x$opt$remove_last_linear_constraint()
+          ### if needed, update progress bar
+          if (isTRUE(verbose)) {
+            cli::cli_progress_update(id = pb)
+          }
+          print("here2")
+          ## generate solution for second extreme point
+          ### modify problem to solve with secondary objective
+          x$opt$set_modelsense(x$modelsense[[2]])
+          x$opt$set_obj(x$obj[2, ])
+          ### solve problem
+          temp_sol <- solver$solve(x$opt)
+          ### modify problem to solve with secondary objective
+          x$opt$set_modelsense(x$modelsense[[1]])
+          x$opt$set_obj(x$obj[1, ])
+          x$opt$append_linear_constraints(
+            rhs = sum(x$obj[2, ] * temp_sol$x),
+            sense = ifelse(x$modelsense[[2]] == "min", "<=", ">="),
+            A = Matrix::sparseMatrix(
+              i = rep(1, ncol(x$obj)),
+              j = seq_len(ncol(x$obj)),
+              x = x$obj[2, ],
+              dims = c(1, ncol(x$obj))
+            ),
+            row_ids = "obj2"
+          )
+          ### if possible, update the starting solution for the solver
+          if (
+            !is.null(solver$data) &&
+            !is.null(temp_sol$x) &&
+            isTRUE("start_solution" %in% names(solver$data))
+          ) {
+            solver$data$start_solution <- temp_sol$x
+          }
+          ### solve problem
+          sols[[2]] <- solver$solve(x$opt)
+          ### reset problem to remove last linear constraint
+          x$opt$remove_last_linear_constraint()
+          ### if needed, update progress bar
+          if (isTRUE(verbose)) {
+            cli::cli_progress_update(id = pb)
+          }
+
+          # ## generate remaining solutions
+          # for (i in seq_len(n_extra)) {
+          #   ### modify problem
+          #   # TODO: add linear constraint for each objective (except first)
+          #   # this will use x$opt$append_linear_constraints()
+          #   ### solve problem
+          #   sols[[i + nrow(x$obj)]] <- solver$solve(x$opt)
+          #   ### reset problem,
+          #   ### this involves removing the extra constraints that were
+          #   ### previously added as part of the epsilon constraint approach
+          #   for (j in seq_len(nrow(x$obj) - 1)) {
+          #     x$opt$remove_last_linear_constraint()
+          #   }
+          #
+          #   ## if possible, update the starting solution for the solver
+          #   if (
+          #     !is.null(solver$data) &&
+          #     !is.null(sols[[i]]$x) &&
+          #     isTRUE("start_solution" %in% names(solver$data))
+          #   ) {
+          #     solver$data$start_solution <- sols[[i]]$x
+          #   }
+          #   ## if needed, update progress bar
+          #   if (isTRUE(verbose)) {
+          #     cli::cli_progress_update(id = pb)
+          #   }
+          # }
+          # ## if needed, clean up progress bar
+          # if (isTRUE(verbose)) {
+          #   cli::cli_progress_done(id = pb)
+          # }
+          #
+          print("here3")
+          ## compute and store objective values for each solution
+          for (i in seq_along(sols)) {
             if (!is.null(sols[[i]]$x)) {
               sols[[i]]$objective <- stats::setNames(
                 rowSums(
@@ -85,60 +187,10 @@ add_epconstraint_approach <- function(x, n, verbose = TRUE) {
                 rownames(x$obj)
               )
             }
-            ## if needed, update progress bar
-            if (isTRUE(verbose)) {
-              cli::cli_progress_update(id = pb)
-            }
           }
-          ## set objective for subsequent optimization runs
-          ## according to the first objective
-          x$opt$set_modelsense(x$modelsense[[1]])
-          x$opt$set_obj(x$obj[1, ])
-          ## calculate constraint values for the remaining solutions
-          # TODO
-          ## generate remaining solutions
-          for (i in seq_len(n_extra)) {
-            ### modify problem
-            # TODO: add linear constraint for each objective (except first)
-            # this will use x$opt$append_linear_constraints()
-            ### solve problem
-            sols[[i + nrow(x$obj)]] <- solver$solve(x$opt)
-            ### reset problem,
-            ### this involves removing the extra constraints that were
-            ### previously added as part of the epsilon constraint approach
-            for (j in seq_len(nrow(x$obj) - 1)) {
-              x$opt$remove_last_linear_constraint()
-            }
-            ### compute and store objective values for each objective
-            if (!is.null(sols[[i]]$x)) {
-              sols[[i + nrow(x$obj)]]$objective <- stats::setNames(
-                rowSums(
-                  x$obj *
-                  matrix(
-                    sols[[i]]$x, ncol = ncol(x$obj),
-                    nrow = nrow(x$obj), byrow = TRUE
-                  )
-                ),
-                rownames(x$obj)
-              )
-            }
-            ## if possible, update the starting solution for the solver
-            if (
-              !is.null(solver$data) &&
-              !is.null(sols[[i]]$x) &&
-              isTRUE("start_solution" %in% names(solver$data))
-            ) {
-              solver$data$start_solution <- sols[[i]]$x
-            }
-            ## if needed, update progress bar
-            if (isTRUE(verbose)) {
-              cli::cli_progress_update(id = pb)
-            }
-          }
-          ## if needed, clean up progress bar
-          if (isTRUE(verbose)) {
-            cli::cli_progress_done(id = pb)
-          }
+
+          assign("s", sols, .GlobalEnv)
+
           ## return solutions
           sols
         }
