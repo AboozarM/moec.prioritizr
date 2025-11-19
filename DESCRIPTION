@@ -29,11 +29,12 @@ Suggests:
     rmarkdown (>= 2.11),
     highs (>= 0.1-10)
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Remotes:
   prioritizr/prioritizr@multiobj
 Collate:
     'internal.R'
     'add_epconstraint_approach.R'
+    'add_epconstraint_obj2_approach.R'
     'prioritizr_assertions.R'
     'prioritizr_assertions_class.R'
