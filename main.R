@@ -19,10 +19,18 @@
         prioritizr::add_binary_decisions(),
       obj3 = prioritizr::problem(sim_zones_pu_raster[[2]], sim_features) %>%
         prioritizr::add_max_utility_objective(budget = 600) %>%
+        prioritizr::add_feature_weights(
+          runif(terra::nlyr(sim_features)) * 100
+        ) %>%
         prioritizr::add_binary_decisions()
     ) %>%
-    add_epconstraint_approach(n = 6, verbose = TRUE) %>%
+    add_epconstraint_approach(n_per_problem = 4, verbose = TRUE) %>%
     prioritizr::add_default_solver(gap = 0, verbose = FALSE)
   # solve problem
   s <- solve(p)
+  print(attr(s, "objective"))
   plot(attr(s, "objective"))
+
+library(lattice)
+wireframe(obj1 ~ obj2 * obj3, data=as.data.frame(attr(s, "objective")))
+plot3d(x,y,z,

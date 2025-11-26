@@ -8,8 +8,14 @@ NULL
 #'
 #' @param x [prioritizr::multi_problem()] object.
 #'
-#' @param n `integer` number of solutions. Note that `n` must be greater
-#' than or equal to the number of objectives in `x`.
+#' @param n_per_problem `integer` number of solutions to generate per
+#' problem in `x`. Note that this does not include solutions that represent
+#' optimizing exclusively on each objective individually (i.e., extreme points
+#' of the Pareto frontier). In particular, the total number of solutions
+#' is equal to \eqn{o + n^(o - 1)}{o + n^(o - 1)}, where
+#' \eqn{o} is the number of problems in `x` and \eqn{n} is equal to
+#' `n_per_problem`. For example, if `x` had three problems and
+#' `n_per_problem = 4`, then 19 solutions would be generated.
 #'
 #' @param verbose `logical` should progress on generating solutions
 #' displayed? Defaults to `TRUE`.
@@ -32,14 +38,14 @@ NULL
 #' }
 #'
 #' @export
-add_epconstraint_approach <- function(x, n, verbose = TRUE) {
+add_epconstraint_approach <- function(x, n_per_problem, verbose = TRUE) {
   # assert arguments are valid,
   assert_required(x)
-  assert_required(n)
+  assert_required(n_per_problem)
   assert_required(verbose)
   assert(
     is_multi_conservation_problem(x),
-    assertthat::is.count(n),
+    assertthat::is.count(n_per_problem),
     assertthat::is.flag(verbose),
     assertthat::noNA(verbose)
   )
@@ -51,17 +57,19 @@ add_epconstraint_approach <- function(x, n, verbose = TRUE) {
       inherit = prioritizr::MultiObjApproach,
       public = list(
         name = "epsilon constraint approach",
-        data = list(n = n, verbose = verbose),
+        data = list(n_per_problem = n_per_problem, verbose = verbose),
         run = function(x, solver) {
           ## initialization
-          n <- self$get_data("n")
+          n_per_problem <- self$get_data("n_per_problem")
           verbose <- self$get_data("verbose")
-          sols <- vector(mode = "list", length = n)
           ## preliminary calculations
           n_obj <- nrow(x$obj)
-          n_extra <- n - nrow(x$obj)
+          n_constraints <- length(x$opt$rhs())
+          n <- n_obj + (n_per_problem^(n_obj - 1))
+          sols <- vector(mode = "list", length = n)
           ## if needed, set up progress bar
           if (isTRUE(verbose)) {
+            cli::cli_inform(paste("Generating", n, "solutions..."))
             pb <- cli::cli_progress_bar("Generating solutions", total = n)
           }
 
@@ -132,25 +140,25 @@ add_epconstraint_approach <- function(x, n, verbose = TRUE) {
             }
           )
 
-          # calculate right-hand-side value for epsilon constraints
+          ## calculate right-hand-side value for epsilon constraints
           epsilon_rhs <- vapply(
-            seq(2L, n_obj), FUN.VALUE = numeric(n_extra), function(j) {
+            seq(2L, n_obj), FUN.VALUE = numeric(n_per_problem), function(j) {
               extreme_obj_val[j, j] +
               (ifelse(identical(x$modelsense[j], "min"), 1, -1) *
-               seq_len(n_extra) *
+               seq_len(n_per_problem) *
               (
                 abs(extreme_obj_val[j, 1] - extreme_obj_val[j, j]) /
-                (n_extra + 1)
+                (n_per_problem + 1)
               ))
             }
           )
-
-          print("epsilon_rhs")
-          print(epsilon_rhs)
+          epsilon_rhs <- do.call(
+            what = expand.grid,
+            args = as.list(as.data.frame(epsilon_rhs))
+          )
 
           ## generate remaining solutions
-          for (i in seq_len(n_extra)) {
-            print("here0")
+          for (i in seq_len(nrow(epsilon_rhs))) {
             ### solve the optimization for the primary objective
             ### modify problem to solve with primary objective
             x$opt$set_modelsense(x$modelsense[[1]])
@@ -170,11 +178,8 @@ add_epconstraint_approach <- function(x, n, verbose = TRUE) {
                 row_ids = "mobj"
               )
             }
-            print("here01")
             ### solve problem
             temp_sol <- solver$solve(x$opt)
-            print("here012")
-
             ### if possible, update the starting solution for the solver
             if (
               !is.null(solver$data) &&
@@ -184,7 +189,6 @@ add_epconstraint_approach <- function(x, n, verbose = TRUE) {
               solver$data$start_solution <- temp_sol$x
             }
             ### perform tie-breaking runs
-            print("here1")
             #### add constraint based on the obj value for the primary run
             x$opt$append_linear_constraints(
               rhs = sum(x$obj[1, ] * temp_sol$x),
@@ -197,8 +201,6 @@ add_epconstraint_approach <- function(x, n, verbose = TRUE) {
               ),
               row_ids = "mobj"
             )
-            print("here11")
-
             ### perform hierachical optimization based on remaining objectives
             for (j in seq(2L, n_obj)) {
               ### modify problem to solve with j'th objective
@@ -230,11 +232,10 @@ add_epconstraint_approach <- function(x, n, verbose = TRUE) {
                 )
               }
             }
-            print("here2")
             ### store the resulting solution as the extreme point
             sols[[i + n_obj]] <- temp_sol
-            ### reset problem for next extreme point
-            for (i in seq_len((n_obj - 1) + 1 + (n_obj - 1))) {
+            ### reset problem for next iteration
+            for (i in seq_len(length(x$opt$rhs()) - n_constraints)) {
               x$opt$remove_last_linear_constraint()
             }
             ### if needed, update progress bar

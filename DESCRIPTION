@@ -2,7 +2,7 @@ Package: moscp
 Title: Multi-objective Systematic Conservation Planning
 Version: 0.0.0.9000
 Authors@R:
-    c(person("First", "Last", , "first.last@example.com", role = c("aut", "cre")),
+    c(person("Aboozar", "Mohammadi", "mohammadi.aboozar@gmail.com", role = c("aut", "cre")),
     person(c('Jeffrey', 'O'), 'Hanson',
     email='jeffrey.hanson@uqconnect.edu.au', role = c('aut'),
     comment = c(ORCID = '0000-0002-4716-6134')))
