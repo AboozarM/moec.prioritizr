@@ -30,7 +30,3 @@
   s <- solve(p)
   print(attr(s, "objective"))
   plot(attr(s, "objective"))
-
-library(lattice)
-wireframe(obj1 ~ obj2 * obj3, data=as.data.frame(attr(s, "objective")))
-plot3d(x,y,z,
