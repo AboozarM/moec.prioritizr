@@ -17,6 +17,10 @@ NULL
 #' `n_per_problem`. For example, if `x` had three problems and
 #' `n_per_problem = 4`, then 19 solutions would be generated.
 #'
+#' @param remove_duplicates `logical` (`TRUE`/`FALSE`) value indicating
+#' if duplicate solutions should be removed from the result.
+#' Defaults to `TRUE`.
+#'
 #' @param verbose `logical` should progress on generating solutions
 #' displayed? Defaults to `TRUE`.
 #'
@@ -38,14 +42,19 @@ NULL
 #' }
 #'
 #' @export
-add_epconstraint_approach <- function(x, n_per_problem, verbose = TRUE) {
+add_epconstraint_approach <- function(x, n_per_problem,
+                                      remove_duplicates = TRUE,
+                                      verbose = TRUE) {
   # assert arguments are valid,
   assert_required(x)
   assert_required(n_per_problem)
+  assert_required(remove_duplicates)
   assert_required(verbose)
   assert(
     is_multi_conservation_problem(x),
     assertthat::is.count(n_per_problem),
+    assertthat::is.flag(remove_duplicates),
+    assertthat::noNA(remove_duplicates),
     assertthat::is.flag(verbose),
     assertthat::noNA(verbose)
   )
@@ -57,7 +66,11 @@ add_epconstraint_approach <- function(x, n_per_problem, verbose = TRUE) {
       inherit = prioritizr::MultiObjApproach,
       public = list(
         name = "epsilon constraint approach",
-        data = list(n_per_problem = n_per_problem, verbose = verbose),
+        data = list(
+          n_per_problem = n_per_problem,
+          remove_duplicates = remove_duplicates,
+          verbose = verbose
+        ),
         run = function(x, solver) {
           ## initialization
           n_per_problem <- self$get_data("n_per_problem")
@@ -247,6 +260,18 @@ add_epconstraint_approach <- function(x, n_per_problem, verbose = TRUE) {
           ## if needed, clean up progress bar
           if (isTRUE(verbose)) {
             cli::cli_progress_done(id = pb)
+          }
+
+          ## if needed, remove duplicate values
+          if (isTRUE(remove_duplicates)) {
+            ### create a key for each solution to identify duplicates
+            int_idx <- x$opt$vtype() %in% c("B", "I")
+            sol_keys <- vapply(
+              sols, FUN.VALUE = character(1),
+              function(x) paste(x$x[int_idx], collapse = " ")
+            )
+            ### remove duplicate solutions
+            sols <- sols[!duplicated(sol_keys)]
           }
 
           ## compute and store objective values for each solution

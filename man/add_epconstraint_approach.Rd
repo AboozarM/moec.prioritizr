@@ -4,18 +4,40 @@
 \alias{add_epconstraint_approach}
 \title{Add epsilon constraint approach}
 \usage{
-add_epconstraint_approach(x, n, verbose = TRUE)
+add_epconstraint_approach(
+  x,
+  n_per_problem,
+  remove_duplicates = TRUE,
+  verbose = TRUE
+)
 
-add_epconstraint_approach(x, n, verbose = TRUE)
+add_epconstraint_approach(
+  x,
+  n_per_problem,
+  remove_duplicates = TRUE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{x}{\code{\link[prioritizr:multi_problem]{prioritizr::multi_problem()}} object.}
 
-\item{n}{\code{integer} number of solutions. Note that \code{n} must be greater
-than or equal to the number of objectives in \code{x}.}
+\item{n_per_problem}{\code{integer} number of solutions to generate per
+problem in \code{x}. Note that this does not include solutions that represent
+optimizing exclusively on each objective individually (i.e., extreme points
+of the Pareto frontier). In particular, the total number of solutions
+is equal to \eqn{o + n^(o - 1)}{o + n^(o - 1)}, where
+\eqn{o} is the number of problems in \code{x} and \eqn{n} is equal to
+\code{n_per_problem}. For example, if \code{x} had three problems and
+\code{n_per_problem = 4}, then 19 solutions would be generated.}
+
+\item{remove_duplicates}{\code{logical} (\code{TRUE}/\code{FALSE}) value indicating
+if duplicate solutions should be removed from the result.
+Defaults to \code{TRUE}.}
 
 \item{verbose}{\code{logical} should progress on generating solutions
 displayed? Defaults to \code{TRUE}.}
+
+\item{n}{\code{integer} number of solutions to generate.}
 }
 \value{
 TODO.
