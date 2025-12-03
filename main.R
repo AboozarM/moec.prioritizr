@@ -24,9 +24,18 @@
         ) %>%
         prioritizr::add_binary_decisions()
     ) %>%
-    add_epconstraint_approach(n_per_problem = 4, verbose = TRUE) %>%
-    prioritizr::add_default_solver(gap = 0, verbose = FALSE)
+    prioritizr::add_highs_solver(gap = 0, verbose = FALSE)
+
+p1 <-
+  p %>% add_epconstraint_approach(n_per_problem = 4, verbose = TRUE)
+# p2 <-
+#   p %>% add_epconstraint_approach_v1(n_per_problem = 4, verbose = TRUE)
   # solve problem
-  s <- solve(p)
-  print(attr(s, "objective"))
-  plot(attr(s, "objective"))
+  s1 <- try(solve(p1))
+  # s2 <- try(solve(p2))
+
+  # 
+  #
+  #
+  # print(attr(s, "objective"))
+  # plot(attr(s, "objective"))

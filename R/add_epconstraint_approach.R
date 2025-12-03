@@ -75,11 +75,15 @@ add_epconstraint_approach <- function(x, n_per_problem,
           ## initialization
           n_per_problem <- self$get_data("n_per_problem")
           verbose <- self$get_data("verbose")
+
           ## preliminary calculations
           n_obj <- nrow(x$obj)
           n_constraints <- length(x$opt$rhs())
           n <- n_obj + (n_per_problem^(n_obj - 1))
           sols <- vector(mode = "list", length = n)
+          x_obj <- x$obj
+          x_modelsense <- x$modelsense
+
           ## if needed, set up progress bar
           if (isTRUE(verbose)) {
             cli::cli_inform(paste("Generating", n, "solutions..."))
@@ -88,69 +92,26 @@ add_epconstraint_approach <- function(x, n_per_problem,
 
           ## generate solutions that are extreme points
           for (i in seq_len(n_obj)) {
-            ### identify the lexicographic order for the objectives
+            ### set the objectives in the correct lexicographic order
             idx <- c(i, seq_len(n_obj)[-i])
-            ### hierahically solve the optimization problem based on this order
-            for (j in idx) {
-              ### modify problem to solve with j'th objective
-              x$opt$set_modelsense(x$modelsense[[j]])
-              x$opt$set_obj(x$obj[j, ])
-              ### solve problem
-              temp_sol <- solver$solve(x$opt)
-              ## if possible, update the starting solution for the solver
-              if (
-                !identical(j, idx[length(idx)]) &&
-                !is.null(solver$data) &&
-                !is.null(temp_sol$x) &&
-                isTRUE("start_solution" %in% names(solver$data))
-              ) {
-                solver$data$start_solution <- temp_sol$x
-              }
-              ### if needed, then add constraint so that
-              ### next run will be constrained based on the j'th objective
-              if (!identical(j, idx[length(idx)])) {
-                x$opt$append_linear_constraints(
-                  rhs = sum(x$obj[j, ] * temp_sol$x),
-                  sense = ifelse(x$modelsense[[j]] == "min", "<=", ">="),
-                  A = Matrix::sparseMatrix(
-                    i = rep(1, ncol(x$obj)),
-                    j = seq_len(ncol(x$obj)),
-                    x = x$obj[j, ],
-                    dims = c(1, ncol(x$obj))
-                  ),
-                  row_ids = "mobj"
-                )
-              }
-            }
-            ### store the resulting solution as the extreme point
-            sols[[i]] <- temp_sol
-            ### reset problem for next extreme point
-            for (i in seq_len(n_obj - 1)) {
-              x$opt$remove_last_linear_constraint()
-            }
+            x$obj <- x_obj[idx, , drop = FALSE]
+            x$modelsense <- x_modelsense[idx]
+            ### generate solution
+            sols[[i]] <- solver$solve_multiobj(x, rel_tol = rep(0, n_obj - 1))
             ### if needed, update progress bar
             if (isTRUE(verbose)) {
               cli::cli_progress_update(id = pb)
             }
           }
 
-          ## extract solutions into matrix format
-          ## matrix where each row is a different extreme point solution, and
-          ## each column is a different solution value for a decision variable
-          extreme_sols_matrix <- t(
-            vapply(sols[seq_len(n_obj)], `[[`, numeric(ncol(x$obj)), 1)
-          )
+          assign("sols0", sols, .GlobalEnv)
 
           ## calculate objective values for extreme points
           ## matrix where each row is a different objective, and
           ## each column is a different extreme point
           extreme_obj_val <- vapply(
-            seq_len(n_obj), FUN.VALUE = numeric(n_obj), function(i) {
-              rowSums(
-                x$obj *
-                extreme_sols_matrix[rep(i, n_obj), , drop = FALSE]
-              )
-            }
+            seq_len(n_obj), FUN.VALUE = numeric(n_obj),
+            function(i) sols[[i]]$objective[rownames(x_obj)]
           )
 
           ## calculate right-hand-side value for epsilon constraints
@@ -170,18 +131,22 @@ add_epconstraint_approach <- function(x, n_per_problem,
             args = as.list(as.data.frame(epsilon_rhs))
           )
 
+          print()
+          print()
+          print()
+
           ## generate remaining solutions
           for (i in seq_len(nrow(epsilon_rhs))) {
             ### solve the optimization for the primary objective
             ### modify problem to solve with primary objective
-            x$opt$set_modelsense(x$modelsense[[1]])
+            x$opt$set_modelsense(x_modelsense[[1]])
             x$opt$set_obj(x$obj[1, ])
             #### add in the linear constraints
             for (j in seq(2L, n_obj)) {
               ### add linear constraint with right-hand-side value
               x$opt$append_linear_constraints(
                 rhs = epsilon_rhs[i, j - 1L],
-                sense = ifelse(x$modelsense[[j]] == "min", "<=", ">="),
+                sense = ifelse(x_modelsense[[j]] == "min", "<=", ">="),
                 A = Matrix::sparseMatrix(
                   i = rep(1, ncol(x$obj)),
                   j = seq_len(ncol(x$obj)),
@@ -194,13 +159,7 @@ add_epconstraint_approach <- function(x, n_per_problem,
             ### solve problem
             temp_sol <- solver$solve(x$opt)
             ### if possible, update the starting solution for the solver
-            if (
-              !is.null(solver$data) &&
-              !is.null(temp_sol$x) &&
-              isTRUE("start_solution" %in% names(solver$data))
-            ) {
-              solver$data$start_solution <- temp_sol$x
-            }
+            solver$set_start_solution(temp_sol$x, warn = FALSE)
             ### perform tie-breaking runs
             #### add constraint based on the obj value for the primary run
             x$opt$append_linear_constraints(
@@ -214,7 +173,7 @@ add_epconstraint_approach <- function(x, n_per_problem,
               ),
               row_ids = "mobj"
             )
-            ### perform hierachical optimization based on remaining objectives
+            ### perform hierarchical optimization based on remaining objectives
             for (j in seq(2L, n_obj)) {
               ### modify problem to solve with j'th objective
               x$opt$set_modelsense(x$modelsense[[j]])
@@ -222,13 +181,7 @@ add_epconstraint_approach <- function(x, n_per_problem,
               ### solve problem
               temp_sol <- solver$solve(x$opt)
               ### if possible, update the starting solution for the solver
-              if (
-                !is.null(solver$data) &&
-                !is.null(temp_sol$x) &&
-                isTRUE("start_solution" %in% names(solver$data))
-              ) {
-                solver$data$start_solution <- temp_sol$x
-              }
+              solver$set_start_solution(temp_sol$x)
               ### if needed, then add constraint so that
               ### next run will be constrained based on the j'th objective
               if (!identical(j, n_obj)) {
@@ -261,6 +214,8 @@ add_epconstraint_approach <- function(x, n_per_problem,
           if (isTRUE(verbose)) {
             cli::cli_progress_done(id = pb)
           }
+
+          assign("sols1", sols, .GlobalEnv)
 
           ## if needed, remove duplicate values
           if (isTRUE(remove_duplicates)) {

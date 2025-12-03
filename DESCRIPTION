@@ -31,10 +31,11 @@ Suggests:
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Remotes:
-  prioritizr/prioritizr@multiobj
+  prioritizr/prioritizr@new-multiobj_hierarchical-fix
 Collate:
     'internal.R'
     'add_epconstraint_approach.R'
+    'add_epconstraint_approach_v1.R'
     'add_epconstraint_obj2_approach.R'
     'prioritizr_assertions.R'
     'prioritizr_assertions_class.R'
