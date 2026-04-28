@@ -153,6 +153,9 @@ add_epconstraint_approach_v1 <- function(x, n_per_problem,
             }
           )
 
+          print("extreme_obj_val")
+          print(extreme_obj_val)
+
           ## calculate right-hand-side value for epsilon constraints
           epsilon_rhs <- vapply(
             seq(2L, n_obj), FUN.VALUE = numeric(n_per_problem), function(j) {
@@ -165,6 +168,11 @@ add_epconstraint_approach_v1 <- function(x, n_per_problem,
               ))
             }
           )
+
+          print("epsilon_rhs0")
+          print(epsilon_rhs)
+          stop()
+
           epsilon_rhs <- do.call(
             what = expand.grid,
             args = as.list(as.data.frame(epsilon_rhs))

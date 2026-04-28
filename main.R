@@ -28,14 +28,7 @@
 
 p1 <-
   p %>% add_epconstraint_approach(n_per_problem = 4, verbose = TRUE)
-# p2 <-
-#   p %>% add_epconstraint_approach_v1(n_per_problem = 4, verbose = TRUE)
-  # solve problem
-  s1 <- try(solve(p1))
-  # s2 <- try(solve(p2))
+s1 <- solve(p1)
 
-  # 
-  #
-  #
-  # print(attr(s, "objective"))
-  # plot(attr(s, "objective"))
+  print(attr(s1, "objective"))
+  plot(attr(s1, "objective"))

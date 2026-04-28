@@ -21,8 +21,8 @@ NULL
 #' if duplicate solutions should be removed from the result.
 #' Defaults to `TRUE`.
 #'
-#' @param verbose `logical` should progress on generating solutions
-#' displayed? Defaults to `TRUE`.
+#' @param verbose `logical` (`TRUE`/`FALSE`) should progress on generating
+#' solutions displayed? Defaults to `TRUE`.
 #'
 #' @details
 #' TODO.
@@ -31,16 +31,85 @@ NULL
 #' TODO.
 #'
 #' @return
-#' TODO.
+#' An updated `multi_problem()` object with the approach
+#' added to it.
 #'
 #' @seealso
-#' TODO.
+#' See [prioritizr::approaches] for other functions for adding an approach.
 #'
 #' @examples
 #' \dontrun{
-#' # TODO
-#' }
+#' # in this example, we aim to identify a set of planning units that will
+#' # not exceed a particular budget and meet objectives for
+#' # (i) representing species that are important for ecosystem
+#' # functioning (hereafter, keystone species) and (ii) representing species
+#' # that have high social or cultural value (hereafter, iconic species)
 #'
+#' # import data
+#' con_cost <- get_sim_pu_raster()
+#' keystone_spp <- get_sim_features()[[1:3]]
+#' iconic_spp <- get_sim_features()[[4:5]]
+#'
+#' # define a total conservation budget (30% of total cost)
+#' budget <- terra::global(con_cost, "sum", na.rm = TRUE)[[1]] * 0.3
+#'
+#' # define a single-objective problem for the keystone species objective
+#' p1 <-
+#'   problem(con_cost, keystone_spp) %>%
+#'   add_min_shortfall_objective(budget) %>%
+#'   add_relative_targets(0.4) %>%
+#'   add_binary_decisions()
+#'
+#' # define a single-objective problem for the iconic species objective
+#' p2 <-
+#'   problem(con_cost, iconic_spp) %>%
+#'   add_min_shortfall_objective(budget) %>%
+#'   add_relative_targets(0.45) %>%
+#'   add_binary_decisions()
+#'
+#' # solve the single-objective problems
+#' s1 <-
+#'   p1 %>%
+#'   add_default_solver(verbose = FALSE) %>%
+#'   solve()
+#' s2 <-
+#'   p2 %>%
+#'   add_default_solver(verbose = FALSE) %>%
+#'   solve()
+#'
+#' # plot the solutions to the single-objective problems
+#' plot(s1, main = "Keystone species", axes = FALSE)
+#' plot(s2, main = "Iconic species", axes = FALSE)
+#'
+#' # now we will a create multi-objective problem that simultaneously
+#' # considers both of these objectives
+#'
+#' # the first objective for keystone species will have a higher order of
+#' # priority than the second objective for iconic species -- because
+#' # the long-term persistence of iconic species depends on ecosystem
+#' # functioning -- and we will then specify that we want to generate
+#' # 5 different solutions for each objective
+#' mp <-
+#'   multi_problem(keystone_obj = p1, iconic_obj = p2) %>%
+#'   add_epconstraint_approach(n_per_objective = 5, verbose = FALSE) %>%
+#'   add_default_solver(verbose = FALSE)
+#'
+#' # solve multi-objective problem
+#' ms <- solve(mp)
+#'
+#' # plot solutions to multi-objective problem
+#' plot(ms, main = "multi-objective solution", axes = FALSE)
+#'
+#' # plot the objectives values to visualize the Pareto frontier
+#' # (note that smaller values are better because these objectives seek to
+#' # minimize representation shortfalls)
+#' plot(
+#'   obj_matrix,
+#'   main = "Pareto frontier",
+#'   xlab = "Keystone objective (shortfall)",
+#'   ylab = "Iconic objective (shortfall)",
+#' )
+#' }
 #' @export
 add_epconstraint_approach <- function(x, n_per_problem,
                                       remove_duplicates = TRUE,
@@ -97,7 +166,11 @@ add_epconstraint_approach <- function(x, n_per_problem,
             x$obj <- x_obj[idx, , drop = FALSE]
             x$modelsense <- x_modelsense[idx]
             ### generate solution
-            sols[[i]] <- solver$solve_multiobj(x, rel_tol = rep(0, n_obj - 1))
+            sols[[i]] <- solver$solve_multiobj(
+              x,
+              priority = idx,
+              rel_tol = rep(0, n_obj - 1)
+            )
             ### if needed, update progress bar
             if (isTRUE(verbose)) {
               cli::cli_progress_update(id = pb)
@@ -114,6 +187,9 @@ add_epconstraint_approach <- function(x, n_per_problem,
             function(i) sols[[i]]$objective[rownames(x_obj)]
           )
 
+          print("extreme_obj_val")
+          print(extreme_obj_val)
+
           ## calculate right-hand-side value for epsilon constraints
           epsilon_rhs <- vapply(
             seq(2L, n_obj), FUN.VALUE = numeric(n_per_problem), function(j) {
@@ -126,14 +202,17 @@ add_epconstraint_approach <- function(x, n_per_problem,
               ))
             }
           )
+
+          print("epsilon_rhs0")
+          print(epsilon_rhs)
+
+
           epsilon_rhs <- do.call(
             what = expand.grid,
             args = as.list(as.data.frame(epsilon_rhs))
           )
 
-          print()
-          print()
-          print()
+          stop()
 
           ## generate remaining solutions
           for (i in seq_len(nrow(epsilon_rhs))) {

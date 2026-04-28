@@ -34,15 +34,16 @@ is equal to \eqn{o + n^(o - 1)}{o + n^(o - 1)}, where
 if duplicate solutions should be removed from the result.
 Defaults to \code{TRUE}.}
 
-\item{verbose}{\code{logical} should progress on generating solutions
-displayed? Defaults to \code{TRUE}.}
+\item{verbose}{\code{logical} (\code{TRUE}/\code{FALSE}) should progress on generating
+solutions displayed? Defaults to \code{TRUE}.}
 
 \item{n}{\code{integer} number of solutions to generate.}
 }
 \value{
 TODO.
 
-TODO.
+An updated \code{multi_problem()} object with the approach
+added to it.
 }
 \description{
 Add a epsilon constraint for multi-objective optimization to a
@@ -65,9 +66,77 @@ TODO.
 
 \examples{
 \dontrun{
-# TODO
-}
+# in this example, we aim to identify a set of planning units that will
+# not exceed a particular budget and meet objectives for
+# (i) representing species that are important for ecosystem
+# functioning (hereafter, keystone species) and (ii) representing species
+# that have high social or cultural value (hereafter, iconic species)
 
+# import data
+con_cost <- get_sim_pu_raster()
+keystone_spp <- get_sim_features()[[1:3]]
+iconic_spp <- get_sim_features()[[4:5]]
+
+# define a total conservation budget (30\% of total cost)
+budget <- terra::global(con_cost, "sum", na.rm = TRUE)[[1]] * 0.3
+
+# define a single-objective problem for the keystone species objective
+p1 <-
+  problem(con_cost, keystone_spp) \%>\%
+  add_min_shortfall_objective(budget) \%>\%
+  add_relative_targets(0.4) \%>\%
+  add_binary_decisions()
+
+# define a single-objective problem for the iconic species objective
+p2 <-
+  problem(con_cost, iconic_spp) \%>\%
+  add_min_shortfall_objective(budget) \%>\%
+  add_relative_targets(0.45) \%>\%
+  add_binary_decisions()
+
+# solve the single-objective problems
+s1 <-
+  p1 \%>\%
+  add_default_solver(verbose = FALSE) \%>\%
+  solve()
+s2 <-
+  p2 \%>\%
+  add_default_solver(verbose = FALSE) \%>\%
+  solve()
+
+# plot the solutions to the single-objective problems
+plot(s1, main = "Keystone species", axes = FALSE)
+plot(s2, main = "Iconic species", axes = FALSE)
+
+# now we will a create multi-objective problem that simultaneously
+# considers both of these objectives
+
+# the first objective for keystone species will have a higher order of
+# priority than the second objective for iconic species -- because
+# the long-term persistence of iconic species depends on ecosystem
+# functioning -- and we will then specify that we want to generate
+# 5 different solutions for each objective
+mp <-
+  multi_problem(keystone_obj = p1, iconic_obj = p2) \%>\%
+  add_epconstraint_approach(n_per_objective = 5, verbose = FALSE) \%>\%
+  add_default_solver(verbose = FALSE)
+
+# solve multi-objective problem
+ms <- solve(mp)
+
+# plot solutions to multi-objective problem
+plot(ms, main = "multi-objective solution", axes = FALSE)
+
+# plot the objectives values to visualize the Pareto frontier
+# (note that smaller values are better because these objectives seek to
+# minimize representation shortfalls)
+plot(
+  obj_matrix,
+  main = "Pareto frontier",
+  xlab = "Keystone objective (shortfall)",
+  ylab = "Iconic objective (shortfall)",
+)
+}
 }
 \references{
 TODO.
@@ -75,5 +144,5 @@ TODO.
 \seealso{
 TODO.
 
-TODO.
+See \link[prioritizr:approaches]{prioritizr::approaches} for other functions for adding an approach.
 }
