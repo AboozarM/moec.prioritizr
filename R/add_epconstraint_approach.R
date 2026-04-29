@@ -161,15 +161,11 @@ add_epconstraint_approach <- function(x, n_per_problem,
 
           ## generate solutions that are extreme points
           for (i in seq_len(n_obj)) {
-            ### set the objectives in the correct lexicographic order
-            idx <- c(i, seq_len(n_obj)[-i])
-            x$obj <- x_obj[idx, , drop = FALSE]
-            x$modelsense <- x_modelsense[idx]
-            ### generate solution
+            ### generate solution with i'th objective as most important
             sols[[i]] <- solver$solve_multiobj(
               x,
-              priority = idx,
-              rel_tol = rep(0, n_obj - 1)
+              priority = replace(seq(n_obj, 1L), i, n_obj + 1L),
+              rel_tol = rep(0, n_obj - 1L)
             )
             ### if needed, update progress bar
             if (isTRUE(verbose)) {
