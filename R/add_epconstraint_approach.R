@@ -173,8 +173,6 @@ add_epconstraint_approach <- function(x, n_per_problem,
             }
           }
 
-          assign("sols0", sols, .GlobalEnv)
-
           ## calculate objective values for extreme points
           ## matrix where each row is a different objective, and
           ## each column is a different extreme point
@@ -182,9 +180,6 @@ add_epconstraint_approach <- function(x, n_per_problem,
             seq_len(n_obj), FUN.VALUE = numeric(n_obj),
             function(i) sols[[i]]$objective[rownames(x_obj)]
           )
-
-          print("extreme_obj_val")
-          print(extreme_obj_val)
 
           ## calculate right-hand-side value for epsilon constraints
           epsilon_rhs <- vapply(
@@ -198,17 +193,10 @@ add_epconstraint_approach <- function(x, n_per_problem,
               ))
             }
           )
-
-          print("epsilon_rhs0")
-          print(epsilon_rhs)
-
-
           epsilon_rhs <- do.call(
             what = expand.grid,
             args = as.list(as.data.frame(epsilon_rhs))
           )
-
-          stop()
 
           ## generate remaining solutions
           for (i in seq_len(nrow(epsilon_rhs))) {
@@ -256,7 +244,7 @@ add_epconstraint_approach <- function(x, n_per_problem,
               ### solve problem
               temp_sol <- solver$solve(x$opt)
               ### if possible, update the starting solution for the solver
-              solver$set_start_solution(temp_sol$x)
+              solver$set_start_solution(temp_sol$x, warn = FALSE)
               ### if needed, then add constraint so that
               ### next run will be constrained based on the j'th objective
               if (!identical(j, n_obj)) {
@@ -290,7 +278,14 @@ add_epconstraint_approach <- function(x, n_per_problem,
             cli::cli_progress_done(id = pb)
           }
 
-          assign("sols1", sols, .GlobalEnv)
+          ## if neeeded, remove infeasible solutions
+          is_valid <- !vapply(sols, function(x) is.null(x$x), logical(1))
+          sols <- sols[is_valid]
+          assert(
+            length(sols) > 1,
+            .internal = TRUE,
+            msg = "Couldn't any feasible solutions."
+          )
 
           ## if needed, remove duplicate values
           if (isTRUE(remove_duplicates)) {
