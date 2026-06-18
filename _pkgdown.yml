@@ -1,0 +1,24 @@
+url: https://AboozarM.github.io/moscp/
+
+authors:
+  Aboozar Mohammadi:
+    href: https://www.cibio.up.pt/en/people/details/aboozar-mohammadi/
+  Jeffrey O Hanson:
+    href: https://jeffrey-hanson.com
+
+template:
+  bootstrap: 5
+  math-rendering: katex
+  params:
+    bootswatch: flatly
+
+reference:
+  - title: Overview
+    desc: Overview of the package.
+    contents:
+      - moscp
+
+  - title: Multi-objective optimization
+    desc: Functions for multi-objective optimization.
+    contents:
+      - ends_with("approach")

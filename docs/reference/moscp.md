@@ -1,0 +1,65 @@
+# moscp: Multi-objective Systematic Conservation Planning
+
+Systematic conservation planning is a framework to identify priority
+areas for conservation management (Giakoumi et al. 2025). Briefly,
+priority areas are identified by formulating a mathematical optimization
+problem based on conservation objectives and requirements and then using
+optimization algorithms to generate solutions. To help account for
+multiple objectives, the moscp package provides an implementation of the
+epsilon-constraint approach for multi-objective optimization (Eichfelder
+2008). The package is designed as a plugin for the prioritizr package –
+a general purpose package for systematic conservation planning (Hanson
+et al. 2025) – and provide enhanced functionality. By using
+multi-objective optimization approaches, conservation scientists and
+practitioners can explore trade-offs and identify solutions that
+represent a desirable compromise among multiple objectives (Neubert et
+al. 2025).
+
+## Citation
+
+Please cite the *moscp R* package when using it in publications. To cite
+the package, please use:
+
+## References
+
+Eichfelder G (2008) *Adaptive Scalarization Methods in Multiobjective
+Optimization*. Springer Berlin Heidelberg.
+
+Giakoumi S, Richardson AJ, Doxa A, Moro S, Andrello M, Hanson JO,
+Hermoso V, Mazor T, McGowan J, Kujala H, Law E, Álvarez Romero JG,
+Magris RA, Gissi E, Arafeh-Dalmau N, Metaxas A, Virtanen EA, Ban NC,
+Runya RM, Dunn DC, Fraschetti S, Galparsoro I, Smith RJ, Bastardie F,
+Stelzenmüller V, Possingham HP, and Katsanevakis S (2025) Advances in
+systematic conservation planning to meet global biodiversity goals.
+*Trends in Ecology and Evolution*, 40: 395–410.
+
+Hanson JO, Schuster R, Strimas‐Mackey M, Morrell N, Edwards BPM, Arcese
+P, Bennett JR, and Possingham HP (2025) Systematic conservation
+prioritization with the prioritizr R package. *Conservation Biology*,
+39: e14376.
+
+Neubert S, McGowan J, Metcalfe K, Hanson JO, Buenafe KCV, Dabalà A, Dunn
+DC, Everett JD, Possingham HP, Stelzenmüller V, Estep A, Ervin J, and
+Richardson AJ (2025) Multiple-use spatial planning for sustainable
+development and conservation. *Trends in Ecology and Evolution*, 40:
+1126–1142.
+
+## See also
+
+Useful links:
+
+- Package website (<https://AboozarM.github.io/moscp/>)
+
+- Source code repository (<https://github.com/AboozarM/moscp>)
+
+- Report bugs (<https://github.com/AboozarM/moscp/issues>)
+
+## Author
+
+Authors:
+
+- Aboozar Mohammadi <mohammadi.aboozar@gmail.com>
+  ([ORCID](https://orcid.org/0000-0003-3411-9424))
+
+- Jeffrey O Hanson <jeffrey.hanson@uqconnect.edu.au>
+  ([ORCID](https://orcid.org/0000-0002-4716-6134))

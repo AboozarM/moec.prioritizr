@@ -1,0 +1,8 @@
+pandoc: '3.3'
+pkgdown: 2.2.0
+pkgdown_sha: ~
+articles: {}
+last_built: 2026-06-18T00:09Z
+urls:
+  reference: https://AboozarM.github.io/moscp/reference
+  article: https://AboozarM.github.io/moscp/articles

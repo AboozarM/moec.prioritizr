@@ -1,4 +1,4 @@
-#' @include internal.R
+#' @include import-standalone-assertions_class.R import-standalone-assertions_handlers.R import-standalone-assertions_functions.R import-standalone-assertions_misc.R import-standalone-cli.R
 NULL
 
 #' Add epsilon constraint approach
@@ -17,10 +17,6 @@ NULL
 #' `n_per_problem`. For example, if `x` had three problems and
 #' `n_per_problem = 4`, then 19 solutions would be generated.
 #'
-#' @param remove_duplicates `logical` (`TRUE`/`FALSE`) value indicating
-#' if duplicate solutions should be removed from the result.
-#' Defaults to `TRUE`.
-#'
 #' @param verbose `logical` (`TRUE`/`FALSE`) should progress on generating
 #' solutions displayed? Defaults to `TRUE`.
 #'
@@ -31,27 +27,30 @@ NULL
 #' TODO.
 #'
 #' @return
-#' An updated `multi_problem()` object with the approach
+#' An updated [prioritizr::multi_problem()] object with the approach
 #' added to it.
 #'
 #' @seealso
 #' See [prioritizr::approaches] for other functions for adding an approach.
 #'
-#' @examples
-#' \dontrun{
+#' @examplesIf prioritizr::do_run_example()
 #' # in this example, we aim to identify a set of planning units that will
 #' # not exceed a particular budget and meet objectives for
 #' # (i) representing species that are important for ecosystem
 #' # functioning (hereafter, keystone species) and (ii) representing species
 #' # that have high social or cultural value (hereafter, iconic species)
 #'
+#' # load packages
+#' library(prioritizr)
+#' library(terra)
+#'
 #' # import data
 #' con_cost <- get_sim_pu_raster()
 #' keystone_spp <- get_sim_features()[[1:3]]
 #' iconic_spp <- get_sim_features()[[4:5]]
 #'
-#' # define a total conservation budget (30% of total cost)
-#' budget <- terra::global(con_cost, "sum", na.rm = TRUE)[[1]] * 0.3
+#' # define a total conservation budget (20% of total cost)
+#' budget <- terra::global(con_cost, "sum", na.rm = TRUE)[[1]] * 0.2
 #'
 #' # define a single-objective problem for the keystone species objective
 #' p1 <-
@@ -64,66 +63,61 @@ NULL
 #' p2 <-
 #'   problem(con_cost, iconic_spp) %>%
 #'   add_min_shortfall_objective(budget) %>%
-#'   add_relative_targets(0.45) %>%
+#'   add_relative_targets(0.8) %>%
 #'   add_binary_decisions()
 #'
-#' # solve the single-objective problems
-#' s1 <-
-#'   p1 %>%
-#'   add_default_solver(verbose = FALSE) %>%
-#'   solve()
-#' s2 <-
-#'   p2 %>%
-#'   add_default_solver(verbose = FALSE) %>%
-#'   solve()
-#'
-#' # plot the solutions to the single-objective problems
-#' plot(s1, main = "Keystone species", axes = FALSE)
-#' plot(s2, main = "Iconic species", axes = FALSE)
-#'
-#' # now we will a create multi-objective problem that simultaneously
-#' # considers both of these objectives
-#'
-#' # the first objective for keystone species will have a higher order of
-#' # priority than the second objective for iconic species -- because
-#' # the long-term persistence of iconic species depends on ecosystem
-#' # functioning -- and we will then specify that we want to generate
-#' # 5 different solutions for each objective
+#' # now create multi-objective problem with epsilon-constraint approach,
+#' # with settings to generate (i) a solution for each objective
+#' # and (ii) three additional solutions that represent a varying
+#' # degree of trade-offs between these objectives
 #' mp <-
 #'   multi_problem(keystone_obj = p1, iconic_obj = p2) %>%
-#'   add_epconstraint_approach(n_per_objective = 5, verbose = FALSE) %>%
-#'   add_default_solver(verbose = FALSE)
+#'   add_epconstraint_approach(n_per_problem = 4, verbose = TRUE) %>%
+#'   add_default_solver(gap = 0, verbose = FALSE)
 #'
-#' # solve multi-objective problem
+#' # solve problem
 #' ms <- solve(mp)
 #'
-#' # plot solutions to multi-objective problem
-#' plot(ms, main = "multi-objective solution", axes = FALSE)
+#' # convert solutions to a multi-layer raster object
+#' sol <- rast(ms)
 #'
-#' # plot the objectives values to visualize the Pareto frontier
+#' # assign names to each solution
+#' names(sol) <- c(
+#'   "Keystone species", "Iconic species",
+#'   paste("trade-off", seq_len(nlyr(sol) - 2))
+#' )
+#'
+#' # plot solutions to view selection of priority areas,
+#' # here, the first two maps show solutions for best achieving
+#' # each of the objectives, and the subsequent maps show solutions
+#' # that aim to reach varying degrees of compromise between the objectives
+#' plot(sol, axes = FALSE)
+#'
+#' # extract objective values for the solutions
+#' obj_matrix <- attributes(ms)$objective
+#'
+#' # print the objective values
+#' print(obj_matrix)
+#'
+#' # plot the objectives values to visualize trade-offs
 #' # (note that smaller values are better because these objectives seek to
 #' # minimize representation shortfalls)
 #' plot(
 #'   obj_matrix,
-#'   main = "Pareto frontier",
+#'   main = "Trade-offs between objectives",
 #'   xlab = "Keystone objective (shortfall)",
-#'   ylab = "Iconic objective (shortfall)",
+#'   ylab = "Iconic objective (shortfall)"
 #' )
-#' }
+#'
 #' @export
-add_epconstraint_approach <- function(x, n_per_problem,
-                                      remove_duplicates = TRUE,
-                                      verbose = TRUE) {
+add_epconstraint_approach <- function(x, n_per_problem, verbose = TRUE) {
   # assert arguments are valid,
   assert_required(x)
   assert_required(n_per_problem)
-  assert_required(remove_duplicates)
   assert_required(verbose)
   assert(
     is_multi_conservation_problem(x),
     assertthat::is.count(n_per_problem),
-    assertthat::is.flag(remove_duplicates),
-    assertthat::noNA(remove_duplicates),
     assertthat::is.flag(verbose),
     assertthat::noNA(verbose)
   )
@@ -137,7 +131,6 @@ add_epconstraint_approach <- function(x, n_per_problem,
         name = "epsilon constraint approach",
         data = list(
           n_per_problem = n_per_problem,
-          remove_duplicates = remove_duplicates,
           verbose = verbose
         ),
         run = function(x, solver) {
@@ -155,8 +148,11 @@ add_epconstraint_approach <- function(x, n_per_problem,
 
           ## if needed, set up progress bar
           if (isTRUE(verbose)) {
-            cli::cli_inform(paste("Generating", n, "solutions..."))
-            pb <- cli::cli_progress_bar("Generating solutions", total = n)
+            pb <- cli::cli_progress_bar(
+              format = cli_progress_bar_format("Generating solutions"),
+              total = n,
+              .envir = parent.frame()
+            )
           }
 
           ## generate solutions that are extreme points
@@ -166,6 +162,11 @@ add_epconstraint_approach <- function(x, n_per_problem,
               x,
               priority = replace(seq(n_obj, 1L), i, n_obj + 1L),
               rel_tol = rep(0, n_obj - 1L)
+            )
+            ### verify feasibility
+            assert(
+              is_valid_raw_solution(sols[[i]], multiple = FALSE),
+              call = rlang::expr(solve())
             )
             ### if needed, update progress bar
             if (isTRUE(verbose)) {
@@ -183,7 +184,8 @@ add_epconstraint_approach <- function(x, n_per_problem,
 
           ## calculate right-hand-side value for epsilon constraints
           epsilon_rhs <- vapply(
-            seq(2L, n_obj), FUN.VALUE = numeric(n_per_problem), function(j) {
+            seq(2L, n_obj), FUN.VALUE = numeric(n_per_problem),
+            function(j) {
               extreme_obj_val[j, j] +
               (ifelse(identical(x$modelsense[j], "min"), 1, -1) *
                seq_len(n_per_problem) *
@@ -193,6 +195,9 @@ add_epconstraint_approach <- function(x, n_per_problem,
               ))
             }
           )
+          if (!is.matrix(epsilon_rhs)) {
+            epsilon_rhs <- matrix(epsilon_rhs, nrow = 1)
+          }
           epsilon_rhs <- do.call(
             what = expand.grid,
             args = as.list(as.data.frame(epsilon_rhs))
@@ -286,18 +291,6 @@ add_epconstraint_approach <- function(x, n_per_problem,
             .internal = TRUE,
             msg = "Couldn't any feasible solutions."
           )
-
-          ## if needed, remove duplicate values
-          if (isTRUE(remove_duplicates)) {
-            ### create a key for each solution to identify duplicates
-            int_idx <- x$opt$vtype() %in% c("B", "I")
-            sol_keys <- vapply(
-              sols, FUN.VALUE = character(1),
-              function(x) paste(x$x[int_idx], collapse = " ")
-            )
-            ### remove duplicate solutions
-            sols <- sols[!duplicated(sol_keys)]
-          }
 
           ## compute and store objective values for each solution
           for (i in seq_along(sols)) {
