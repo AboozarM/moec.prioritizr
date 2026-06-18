@@ -1,11 +1,11 @@
-Package: moscp
-Title: Multi-objective Systematic Conservation Planning
+Package: moec.prioritizr
+Title: Multi-Objective Prioritization with the Epsilon-Constraint Approach
 Version: 1.0.0
 Authors@R:
     c(person('Aboozar', 'Mohammadi',
     email='mohammadi.aboozar@gmail.com',
     role=c('aut', 'cre'),
-    comment=c(ORID = '0000-0003-3411-9424')),
+    comment = c(ORCID = '0000-0003-3411-9424')),
     person(c('Jeffrey', 'O'), 'Hanson',
     email='jeffrey.hanson@uqconnect.edu.au',
     role = c('aut'),
@@ -13,42 +13,39 @@ Authors@R:
 Description:
     Systematic conservation planning is a framework to identify
     priority areas for conservation management
-    (Giakoumi et al. 2025, <https://doi.org/10.1016/j.tree.2024.12.002>).
+    (Giakoumi et al. 2025, <doi:10.1016/j.tree.2024.12.002>).
     Briefly, priority areas are identified by
     formulating a mathematical optimization problem based on conservation
     objectives and requirements and then using optimization algorithms
     to generate solutions. To help account for multiple objectives,
     this package provides an implementation
     of the epsilon-constraint approach for multi-objective optimization
-    (Eichfelder 2008, <https://doi.org/10.1007/978-3-540-79159-1>).
+    (Eichfelder 2008, <doi:10.1007/978-3-540-79159-1>).
     This package is designed as a plugin for
     the 'prioritizr' package, a general purpose
     package for systematic conservation planning
-    (Hanson et al. 2025, <https://doi.org/10.1111/cobi.14376>),
+    (Hanson et al. 2025, <doi:10.1111/cobi.14376>),
     and provides enhanced functionality.
     By using multi-objective optimization approaches, conservation scientists
     and practitioners can explore trade-offs and identify
     solutions that represent a desirable compromise among multiple objectives
-    (Neubert et al. 2025, <https://doi.org/10.1016/j.tree.2025.09.007>).
+    (Neubert et al. 2025, <doi:10.1016/j.tree.2025.09.007>).
 License: GPL-3
 Language: en-US
 Encoding: UTF-8
-URL: https://AboozarM.github.io/moscp/, https://github.com/AboozarM/moscp
-BugReports: https://github.com/AboozarM/moscp/issues
+URL: https://AboozarM.github.io/moec.prioritizr/, https://github.com/AboozarM/moec.prioritizr
+BugReports: https://github.com/AboozarM/moec.prioritizr/issues
 VignetteBuilder: knitr
 Depends:
     R (>= 4.1.0)
 Imports:
-    utils,
-    methods,
     cli (>= 3.6.0),
+    R6 (>= 2.5.1),
     assertthat (>= 0.2.0),
-    tibble (>= 2.0.0),
     Matrix (>= 1.3-0),
     prioritizr (>= 9.0.0.0),
     rlang (>= 1.1.0),
     terra (>= 1.8-54),
-    parallel,
     units (>= 0.8.7)
 Suggests:
     testthat (>= 3.1.0),

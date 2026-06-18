@@ -3,9 +3,8 @@
 ## Authors
 
 - **[Aboozar
-  Mohammadi](https://www.cibio.up.pt/en/people/details/aboozar-mohammadi/)**.
-  Author, maintainer.  
-  0000-0003-3411-9424
+  Mohammadi](https://pt.linkedin.com/in/aboozar-mohammadi-4a2559b0)**.
+  Author, maintainer. [](https://orcid.org/0000-0003-3411-9424)
 
 - **[Jeffrey O Hanson](https://jeffrey-hanson.com)**. Author.
   [](https://orcid.org/0000-0002-4716-6134)
@@ -13,16 +12,16 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/AboozarM/moscp/blob/HEAD/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/AboozarM/moec.prioritizr/blob/HEAD/DESCRIPTION)
 
-Mohammadi A, Hanson JO (2026). *moscp: Multi-objective Systematic
-Conservation Planning*. R package version 1.0.0,
-<https://AboozarM.github.io/moscp/>.
+Mohammadi A, Hanson JO (2026). *moec.prioritizr: Multi-Objective
+Prioritization with the Epsilon-Constraint Approach*. R package version
+1.0.0, <https://AboozarM.github.io/moec.prioritizr/>.
 
     @Manual{,
-      title = {moscp: Multi-objective Systematic Conservation Planning},
+      title = {moec.prioritizr: Multi-Objective Prioritization with the Epsilon-Constraint Approach},
       author = {Aboozar Mohammadi and Jeffrey O Hanson},
       year = {2026},
       note = {R package version 1.0.0},
-      url = {https://AboozarM.github.io/moscp/},
+      url = {https://AboozarM.github.io/moec.prioritizr/},
     }

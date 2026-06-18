@@ -1,4 +1,4 @@
-#' moscp: Multi-objective Systematic Conservation Planning
+#' moec.prioritizr: Multi-Objective Prioritization with the Epsilon-Constraint Approach
 #'
 #' Systematic conservation planning is a framework to identify
 #' priority areas for conservation management (Giakoumi et al. 2025).
@@ -6,7 +6,7 @@
 #' formulating a mathematical optimization problem based on conservation
 #' objectives and requirements and then using optimization algorithms
 #' to generate solutions. To help account for multiple objectives,
-#' the \pkg{moscp} package provides an implementation
+#' the \pkg{moec.prioritizr} package provides an implementation
 #' of the epsilon-constraint approach for multi-objective optimization
 #' (Eichfelder 2008). The package is designed as a plugin for
 #' the \pkg{prioritizr} package -- a general purpose
@@ -18,15 +18,15 @@
 #' (Neubert et al. 2025).
 #'
 #' @section Citation:
-#' Please cite the _moscp R_ package when using it in publications. To
+#' Please cite the _moec.prioritizr R_ package when using it in publications. To
 #' cite the package, please use:
 #'
 #'
 #' @seealso
 #' Useful links:
-#' * Package website (<https://AboozarM.github.io/moscp/>)
-#' * Source code repository (<https://github.com/AboozarM/moscp>)
-#' * Report bugs (<https://github.com/AboozarM/moscp/issues>)
+#' * Package website (<https://AboozarM.github.io/moec.prioritizr/>)
+#' * Source code repository (<https://github.com/AboozarM/moec.prioritizr>)
+#' * Report bugs (<https://github.com/AboozarM/moec.prioritizr/issues>)
 #'
 #' @author
 #'  Authors:
@@ -55,10 +55,14 @@
 #' development and conservation. *Trends in Ecology and Evolution*,
 #' 40: 1126--1142.
 #'
-#' @name moscp
+#' @name moec.prioritizr
 #' @docType package
-#' @aliases moscp-package
+#' @aliases moec.prioritizr-package
 "_PACKAGE"
+
+# avoid false positive NOTES
+#' @importFrom terra rast
+NULL
 
 # avoid CRAN check NOTES due to R6 classes
 # see: https://github.com/r-lib/R6/issues/230

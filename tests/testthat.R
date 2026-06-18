@@ -5,7 +5,7 @@ is_skip <- !identical(Sys.getenv("NOT_CRAN"), "true")
 if (!is_skip) {
   ## load packages
   library(testthat)
-  library(moscp)
+  library(moec.prioritizr)
 
   ## disable parallel testing
   Sys.unsetenv("R_TESTS")
@@ -18,5 +18,5 @@ if (!is_skip) {
   }
 
   ## check tests
-  test_check("moscp", reporter = reporter)
+  test_check("moec.prioritizr", reporter = reporter)
 }

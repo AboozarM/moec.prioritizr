@@ -1,5 +1,5 @@
 # Changelog
 
-## moscp 1.0.0
+## moec.prioritizr 1.0.0
 
 - Initial release.

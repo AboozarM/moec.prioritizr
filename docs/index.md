@@ -1,12 +1,12 @@
-## moscp: Multi-objective Systematic Conservation Planning
+## moec.prioritizr: Multi-Objective Prioritization with the Epsilon-Constraint Approach
 
 [![lifecycle](https://img.shields.io/badge/Lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html)
-[![R-CMD-check-Ubuntu](https://img.shields.io/github/actions/workflow/status/AboozarM/moscp/R-CMD-check-ubuntu.yaml?branch=master&label=Ubuntu)](https://github.com/AboozarM/moscp/actions)
-[![R-CMD-check-Windows](https://img.shields.io/github/actions/workflow/status/AboozarM/moscp/R-CMD-check-windows.yaml?branch=master&label=Windows)](https://github.com/AboozarM/moscp/actions)
-[![R-CMD-check-macOS](https://img.shields.io/github/actions/workflow/status/AboozarM/moscp/R-CMD-check-macos.yaml?branch=master&label=macOS)](https://github.com/AboozarM/moscp/actions)
-[![Documentation](https://img.shields.io/github/actions/workflow/status/AboozarM/moscp/documentation.yaml?branch=master&label=Documentation)](https://github.com/AboozarM/moscp/actions)
+[![R-CMD-check-Ubuntu](https://img.shields.io/github/actions/workflow/status/AboozarM/moec.prioritizr/R-CMD-check-ubuntu.yaml?branch=master&label=Ubuntu)](https://github.com/AboozarM/moec.prioritizr/actions)
+[![R-CMD-check-Windows](https://img.shields.io/github/actions/workflow/status/AboozarM/moec.prioritizr/R-CMD-check-windows.yaml?branch=master&label=Windows)](https://github.com/AboozarM/moec.prioritizr/actions)
+[![R-CMD-check-macOS](https://img.shields.io/github/actions/workflow/status/AboozarM/moec.prioritizr/R-CMD-check-macos.yaml?branch=master&label=macOS)](https://github.com/AboozarM/moec.prioritizr/actions)
+[![Documentation](https://img.shields.io/github/actions/workflow/status/AboozarM/moec.prioritizr/documentation.yaml?branch=master&label=Documentation)](https://github.com/AboozarM/moec.prioritizr/actions)
 [![Coverage
-Status](https://img.shields.io/codecov/c/github/AboozarM/moscp?label=Coverage)](https://app.codecov.io/gh/AboozarM/moscp/branch/master)
+Status](https://img.shields.io/codecov/c/github/AboozarM/moec.prioritizr?label=Coverage)](https://app.codecov.io/gh/AboozarM/moec.prioritizr/branch/master)
 
 ### Overview
 
@@ -16,10 +16,11 @@ al. 2025](https://doi.org/10.1016/j.tree.2024.12.002)). Briefly,
 priority areas are identified by formulating a mathematical optimization
 problem based on conservation objectives and requirements and then using
 optimization algorithms to generate solutions. To help account for
-multiple objectives, the *moscp R* package provides an implementation of
-the epsilon-constraint approach for multi-objective optimization
-([Eichfelder 2008](https://doi.org/10.1007/978-3-540-79159-1)). The
-package is designed as a plugin for the [*prioritizr R*
+multiple objectives, the *moec.prioritizr R* package provides an
+implementation of the epsilon-constraint approach for multi-objective
+optimization ([Eichfelder
+2008](https://doi.org/10.1007/978-3-540-79159-1)). The package is
+designed as a plugin for the [*prioritizr R*
 package](https://prioritizr.net) – a general purpose package for
 systematic conservation planning ([Hanson et
 al. 2025](https://doi.org/10.1111/cobi.14376)) – and provide enhanced
@@ -33,9 +34,9 @@ al. 2025](https://doi.org/10.1016/j.tree.2025.09.007)).
 
 #### Package installation
 
-The [latest developmental version of the *moscp R*
-package](https://github.com/AboozarM/moscp) can be installed using the
-following *R* code. Please note that it requires the
+The [latest developmental version of the *moec.prioritizr R*
+package](https://github.com/AboozarM/moec.prioritizr) can be installed
+using the following *R* code. Please note that it requires the
 [*sf*](https://CRAN.R-project.org/package=sf) and
 [*terra*](https://CRAN.R-project.org/package=terra) *R* packages, which
 may require additional software to be installed. If you encounter
@@ -44,14 +45,14 @@ installation instructions.
 
 ``` r
 if (!require(remotes)) install.packages("remotes")
-remotes::install_github("AboozarM/moscp")
+remotes::install_github("AboozarM/moec.prioritizr")
 ```
 
 ### Usage
 
-Here we provide a short example for using the *moscp R* package to
-generate conservation plans (hereafter, prioritizations) with the
-*prioritizr R* package. Specifically, we will use an example dataset
+Here we provide a short example for using the *moec.prioritizr R*
+package to generate conservation plans (hereafter, prioritizations) with
+the *prioritizr R* package. Specifically, we will use an example dataset
 available through the *prioritizrdata R* package. Additionally, we will
 use the *terra R* package to perform raster calculations and the
 *ggplot2 R* package for visualizations. To begin with, we will load the
@@ -65,24 +66,6 @@ packages.
 library(prioritizr)
 library(prioritizrdata)
 library(terra)
-```
-
-``` R
-## terra 1.9.27
-
-## 
-## Attaching package: 'terra'
-
-## The following object is masked from 'package:prioritizr':
-## 
-##     ncell
-
-## The following objects are masked from 'package:testthat':
-## 
-##     compare, describe
-```
-
-``` r
 library(ggplot2)
 ```
 
@@ -299,7 +282,7 @@ consider relative targets of 40%). Additionally, we will use locked in
 constraints so that existing protected areas are selected by the
 prioritization and ensure priority areas complement existing protected
 areas. Furthermore, we will set budgets to ensure that the total cost of
-the existing protected areas and priority areas does not exceed 2% of
+the existing protected areas and priority areas does not exceed 3% of
 total costs across the study area. Since we have multiple conservation
 objectives that we want to consider, we will use the epsilon-constraint
 approach for multi-objective optimization. This particular approach is
@@ -312,7 +295,7 @@ please refer to the [*prioritizr R* package
 documentation](https://prioritizr.net).
 
 ``` r
-# define a total conservation budget (2% of total cost)
+# define a total conservation budget (3% of total cost)
 budget <- 0.03 * terra::global(wa_pu, "sum", na.rm = TRUE)[[1]]
 
 # create single-objective problem for threatened species
@@ -351,7 +334,7 @@ mp <-
     public_interest_species = p2,
     vulnerable_carbon = p3
   ) %>%
-  add_epconstraint_approach(n_per_problem = 4, verbose = TRUE) %>%
+  add_epconstraint_approach(n_per_problem = 3, verbose = TRUE) %>%
   add_default_solver(verbose = FALSE)
 
 # print multi-objective problem
@@ -391,7 +374,7 @@ print(mp)
 ## ││└•1:          locked in constraints (555 planning units)
 ## │└•decisions:   binary decision
 ## └•optimization
-##  ├•approach:    epsilon constraint approach (`n_per_problem` = 4, `verbose` = TRUE)
+##  ├•approach:    epsilon constraint approach (`n_per_problem` = 3, `verbose` = TRUE)
 ##  └•solver:      gurobi solver (`gap` = 0.1, `time_limit` = 2147483647, `presolve` = 2, `threads` = 1, …)
 ## # ℹ Use `summary(...)` to see further details.
 ```
@@ -411,7 +394,7 @@ print(length(ms))
 ```
 
 ``` R
-## [1] 17
+## [1] 7
 ```
 
 ``` r
@@ -492,24 +475,14 @@ print(metric_data)
 ```
 
 ``` R
-##           name threatened_species public_interest_species vulnerable_carbon
-## 1   solution_1          0.3581032                48.35750          20.36066
-## 2   solution_2          0.3561382                51.65796          21.58850
-## 3   solution_3          0.2286733                34.95139          16.57897
-## 4   solution_4          0.2165204                49.69747          21.82578
-## 5   solution_5          0.2373384                49.13819          21.58842
-## 6   solution_6          0.2826271                51.33665          22.21674
-## 7   solution_7          0.2900626                50.43655          21.89511
-## 8   solution_8          0.2918731                50.08743          21.85335
-## 9   solution_9          0.2951771                49.45884          21.54879
-## 10 solution_10          0.3178872                51.63114          22.09120
-## 11 solution_11          0.3226420                50.33075          21.60632
-## 12 solution_12          0.3241327                49.71552          21.32632
-## 13 solution_13          0.3250354                49.45701          21.23156
-## 14 solution_14          0.3349207                53.51664          22.63044
-## 15 solution_15          0.3317497                54.32316          22.97394
-## 16 solution_16          0.3424787                50.08409          21.15019
-## 17 solution_17          0.3446247                49.19050          20.92718
+##         name threatened_species public_interest_species vulnerable_carbon
+## 1 solution_1          0.3581032                48.35750          20.36066
+## 2 solution_2          0.3561382                51.65796          21.58850
+## 3 solution_3          0.2286733                34.95139          16.57897
+## 4 solution_4          0.2221509                50.82648          22.26093
+## 5 solution_5          0.2570307                49.14630          21.59461
+## 6 solution_6          0.3059821                50.89432          21.91841
+## 7 solution_7          0.3329506                50.81979          21.60339
 ```
 
 ``` r
@@ -523,14 +496,17 @@ p <-
       color = vulnerable_carbon
     )
   ) +
-  geom_point(size = 10) +
+  geom_point(size = 8) +
   scale_color_viridis_c() +
   labs(
     x = "Threatened species representation (%)",
     y = "Public interest species representation (%)",
     color = "Vulnerable carbon representation (%)",
+  ) +
+  theme(
+    legend.position = c(0.99, 0.01),
+    legend.justification = c(1, 0)
   )
-
 
 # show plot
 print(p)
@@ -540,16 +516,18 @@ print(p)
 
 ### Citation
 
-Please cite the *moscp R* package when using it in publications. To cite
-the package, please use:
+Please cite the *moec.prioritizr R* package when using it in
+publications. To cite the package, please use:
 
-> Mohammadi A and Hanson JO (2026). *moscp: Multi-objective Systematic
-> Conservation Planning*. R package version 1.0.0,
-> <https://AboozarM.github.io/moscp/>.
+> Mohammadi A and Hanson JO (2026). *moec.prioritizr: Multi-objective
+> prioritization with the epsilon-constraint approach*. R package
+> version 1.0.0, <https://AboozarM.github.io/moec.prioritizr/>.
 
 ### Getting help
 
-Please refer to the [package website](https://AboozarM.github.io/moscp/)
-for more information. If you have any questions about using the package
-or suggestions for improving it, please [file an issue at the package’s
-online code repository](https://github.com/AboozarM/moscp/issues).
+Please refer to the [package
+website](https://AboozarM.github.io/moec.prioritizr/) for more
+information. If you have any questions about using the package or
+suggestions for improving it, please [file an issue at the package’s
+online code
+repository](https://github.com/AboozarM/moec.prioritizr/issues).

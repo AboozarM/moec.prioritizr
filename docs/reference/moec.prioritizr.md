@@ -1,24 +1,24 @@
-# moscp: Multi-objective Systematic Conservation Planning
+# moec.prioritizr: Multi-objective prioritization with the epsilon-constraint approach
 
 Systematic conservation planning is a framework to identify priority
 areas for conservation management (Giakoumi et al. 2025). Briefly,
 priority areas are identified by formulating a mathematical optimization
 problem based on conservation objectives and requirements and then using
 optimization algorithms to generate solutions. To help account for
-multiple objectives, the moscp package provides an implementation of the
-epsilon-constraint approach for multi-objective optimization (Eichfelder
-2008). The package is designed as a plugin for the prioritizr package –
-a general purpose package for systematic conservation planning (Hanson
-et al. 2025) – and provide enhanced functionality. By using
-multi-objective optimization approaches, conservation scientists and
-practitioners can explore trade-offs and identify solutions that
-represent a desirable compromise among multiple objectives (Neubert et
-al. 2025).
+multiple objectives, the moec.prioritizr package provides an
+implementation of the epsilon-constraint approach for multi-objective
+optimization (Eichfelder 2008). The package is designed as a plugin for
+the prioritizr package – a general purpose package for systematic
+conservation planning (Hanson et al. 2025) – and provide enhanced
+functionality. By using multi-objective optimization approaches,
+conservation scientists and practitioners can explore trade-offs and
+identify solutions that represent a desirable compromise among multiple
+objectives (Neubert et al. 2025).
 
 ## Citation
 
-Please cite the *moscp R* package when using it in publications. To cite
-the package, please use:
+Please cite the *moec.prioritizr R* package when using it in
+publications. To cite the package, please use:
 
 ## References
 
@@ -48,11 +48,11 @@ development and conservation. *Trends in Ecology and Evolution*, 40:
 
 Useful links:
 
-- Package website (<https://AboozarM.github.io/moscp/>)
+- Package website (<https://AboozarM.github.io/moec.prioritizr/>)
 
-- Source code repository (<https://github.com/AboozarM/moscp>)
+- Source code repository (<https://github.com/AboozarM/moec.prioritizr>)
 
-- Report bugs (<https://github.com/AboozarM/moscp/issues>)
+- Report bugs (<https://github.com/AboozarM/moec.prioritizr/issues>)
 
 ## Author
 

@@ -4,13 +4,14 @@
 
 Overview of the package.
 
-- [`moscp`](https://AboozarM.github.io/moscp/reference/moscp.md)
-  [`moscp-package`](https://AboozarM.github.io/moscp/reference/moscp.md)
-  : moscp: Multi-objective Systematic Conservation Planning
+- [`moec.prioritizr`](https://AboozarM.github.io/moec.prioritizr/reference/moec.prioritizr.md)
+  [`moec.prioritizr-package`](https://AboozarM.github.io/moec.prioritizr/reference/moec.prioritizr.md)
+  : moec.prioritizr: Multi-objective prioritization with the
+  epsilon-constraint approach
 
 ## Multi-objective optimization
 
 Functions for multi-objective optimization.
 
-- [`add_epconstraint_approach()`](https://AboozarM.github.io/moscp/reference/add_epconstraint_approach.md)
+- [`add_epconstraint_approach()`](https://AboozarM.github.io/moec.prioritizr/reference/add_epconstraint_approach.md)
   : Add epsilon constraint approach

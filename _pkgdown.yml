@@ -1,8 +1,8 @@
-url: https://AboozarM.github.io/moscp/
+url: https://AboozarM.github.io/moec.prioritizr/
 
 authors:
   Aboozar Mohammadi:
-    href: https://www.cibio.up.pt/en/people/details/aboozar-mohammadi/
+    href: https://pt.linkedin.com/in/aboozar-mohammadi-4a2559b0
   Jeffrey O Hanson:
     href: https://jeffrey-hanson.com
 
@@ -16,7 +16,7 @@ reference:
   - title: Overview
     desc: Overview of the package.
     contents:
-      - moscp
+      - moec.prioritizr
 
   - title: Multi-objective optimization
     desc: Functions for multi-objective optimization.

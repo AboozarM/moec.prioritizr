@@ -2,7 +2,7 @@ pandoc: '3.3'
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles: {}
-last_built: 2026-06-18T00:09Z
+last_built: 2026-06-18T22:13Z
 urls:
-  reference: https://AboozarM.github.io/moscp/reference
-  article: https://AboozarM.github.io/moscp/articles
+  reference: https://AboozarM.github.io/moec.prioritizr/reference
+  article: https://AboozarM.github.io/moec.prioritizr/articles

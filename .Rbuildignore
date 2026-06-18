@@ -1,5 +1,6 @@
 ^Meta$
 ^doc$
+^man/cache$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.travis\.yml$
@@ -25,6 +26,7 @@ inst/URLLIST
 ^CONTRIBUTING\.md$
 ^CONTRIBUTING\.Rmd$
 pkgdown
+LICENSE
 .covrignore
 ^\.github$
 codecov.yml

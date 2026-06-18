@@ -105,6 +105,7 @@ mp <-
 # solve problem
 ms <- solve(mp)
 #> Generating solutions ■■■■■■■■■■■■■■■■                 | 3/6 |  50% | ETA: 2s
+#> Generating solutions ■■■■■■■■■■■■■■■■■■■■■■■■■■       | 5/6 |  83% | ETA: 1s
 #> Generating solutions ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  | 6/6 | 100% | ETA: 0s
 
 # convert solutions to a multi-layer raster object
