@@ -4,27 +4,180 @@ NULL
 #' Add epsilon constraint approach
 #'
 #' Add an epsilon-constraint approach for multi-objective optimization to a
-#' conservation planning problem.
+#' conservation planning problem (Eichfelder 2008).
 #'
 #' @param x [prioritizr::multi_problem()] object.
 #'
-#' @param n_per_problem `integer` number of solutions to generate per
-#' problem in `x`. Note that this does not include solutions that represent
-#' optimizing exclusively on each objective individually (i.e., extreme points
-#' of the Pareto frontier). In particular, the total number of solutions
-#' is equal to \eqn{o + n^(o - 1)}{o + n^(o - 1)}, where
+#' @param n_per_problem `integer` number of solutions to attempt to generate per
+#' problem in `x`. Note that this number does not include solutions that
+#' represent optimizing exclusively on each objective individually (i.e.,
+#' extreme points of the Pareto frontier). In particular, the total number of
+#' solutions that this approach attempts to generate is is equal to
+#' \eqn{o + n^{(o - 1)}}{o + n^(o - 1)}, where
 #' \eqn{o} is the number of problems in `x` and \eqn{n} is equal to
 #' `n_per_problem`. For example, if `x` had three problems and
-#' `n_per_problem = 4`, then 19 solutions would be generated.
+#' `n_per_problem = 4`, then this approach will attempt to generate 19
+#' solutions. Due to the mathematical details of this approach (see below), it
+#' is not guaranteed to generate a solution for each attempt and will
+#' often generate fewer solutions than it attempts.
 #'
 #' @param verbose `logical` (`TRUE`/`FALSE`) should progress on generating
 #' solutions displayed? Defaults to `TRUE`.
 #'
 #' @details
-#' TODO.
+#' This multi-objective optimization approach is especially useful for
+#' characterizing the full range of trade-offs between objectives when
+#' there is a well-defined order of importance among the objectives in a
+#' planning exercise.
+#' In general, we recommend using this approach for characterizing
+#' the full range of trade-offs between objectives because it has procedures
+#' that automatically account for the best and worst possible levels for
+#' achievement when optimizing each of the different objectives.
+#' Due to these procedures, this approach does not require the user
+#' to specify trade-off parameters (e.g., unlike `rel_tol` for
+#' [prioritizr::add_hier_approach()]) and instead only requires
+#' the user to specify a parameter that reflects the maximum number of
+#' desired solutions. Furthermore, this approach is not sensitive to
+#' differences in scale among different objectives (unlike the weighted sum
+#' approach, [prioritizr::add_wtd_sum_approach()];
+#' see Das and Dennis 1997 for details), and so it
+#' can be readily applied to a wide range of objectives.
 #'
 #' @section Mathematical formulation:
-#' TODO.
+#' This approach can be expressed mathematically for a set of
+#' objectives associated with the [problem()] objects in `x`.
+#' Let \eqn{O}{O} denote the set of objectives (indexed by \eqn{o}{o}).
+#' For brevity, we will assume that all of the objectives should ideally be
+#' maximized and have been sorted in order of
+#' priority (per `priority`), such that the objective with the highest priority
+#' is \eqn{o=1}{o=1}, objective with the second highest priority is
+#' \eqn{o=2}{o=2}, and so on.
+#' Although this approach can be applied to an arbitrary number
+#' of objectives, we will assume that \eqn{O}{O} has three objectives when
+#' explaining this approach.
+#' Also, let \eqn{f_o(x)}{fo(x)} denote the objective function for each
+#' objective \eqn{o \in O}{o in O}, where \eqn{x} represents all the decision
+#' variables for calculating the objective values (e.g., planning unit selection
+#' status values).
+#' Additionally, let \eqn{S}{S} represent the set (region) of feasible
+#' values for \eqn{x} based on the constraints for all of the objectives
+#' (e.g., if the first problem in `x` has locked in constraints and the
+#' second problem has locked out constraints, then \eqn{S}{S} would
+#' account for both the locked in and locked out constraints).
+#' Given this terminology, the approach starts by formulating a set of
+#' multi-objective optimization problems to generate a solution
+#' that focuses primarily on each objective whilst accounting for the
+#' the other objectives too (hereafter, extreme points).
+#' Note that these multi-objective optimization problems are solved
+#' using the hierarchical approach to optimization with relative tolerance
+#' values set to zero (see [prioritizr::add_hier_approach()]) for details).
+#'
+#' Multi-objective problem for first extreme point:
+#' \deqn{
+#' \mathit{Maximize} \space f_1(x), f_2(x), f_3(x) \\
+#' \mathit{subject \space to \space} x \in S
+#' }{
+#' Maximize f1(x), f2(x), f3(x), subject to x in S
+#' }
+#'
+#' Multi-objective problem for second extreme point:
+#' \deqn{
+#' \mathit{Maximize} \space f_2(x), f_1(x), f_3(x) \\
+#' \mathit{subject \space to \space} x \in S
+#' }{
+#' Maximize f2(x), f1(x), f3(x), subject to x in S
+#' }
+#'
+#' Multi-objective problem for third extreme point:
+#' \deqn{
+#' \mathit{Maximize} \space f_3(x), f_1(x), f_2(x) \\
+#' \mathit{subject \space to \space} x \in S
+#' }{
+#' Maximize f3(x), f1(x), f2(x), subject to x in S
+#' }
+#'
+#' After solving these problems to generate solutions,
+#' let \eqn{b_o}{bo} denote the best
+#' objective value for each objective. Also let \eqn{w_o}{wo} denote the
+#' worst value for each objective. For each objective -- except for
+#' the first objective -- we then generate
+#' a sequence of (evenly distributed) numbers ranging from the worst objective
+#' value (per \eqn{w_o}{wo}) to the best objective value (per \eqn{b_o}{bo}),
+#' based on a predefined number of values (per `n_per_problem`).
+#' For example, if the second objective had \eqn{w_o = 1}{wo = 1} and
+#' \eqn{b_o = 5}{bo = 5} and `n_per_problem = 3`, then
+#' the sequence of numbers for this objective would be equal to
+#' \eqn{\{2, 3, 4\}}.
+#' Similarly, if the third objective had \eqn{w_o = 5}{wo = 5} and
+#' \eqn{b_o = 15}{bo = 15} and `n_per_problem = 3`, then
+#' the sequence of numbers for this objective would be equal to
+#' \eqn{\{7.5, 10.0, 12.5\}}.
+#'
+#' We then use these sequences of numbers to generate a set of numbers
+#' that represents all possible combinations of numbers for each objective.
+#' For example, if we considered the previous sequences of
+#' (second objective) \eqn{\{2, 3, 4\}} and (third objective)
+#' \eqn{\{7.5, 10.0, 12.5\}}, then we would generate the following
+#' set of nine combinations of numbers:
+#' \eqn{\{2, 7.5\}}, \eqn{\{3, 7.5\}}, \eqn{\{4, 7.5\}}, \eqn{\{2, 10\}},
+#' \eqn{\{3, 10\}}, \eqn{\{4, 10\}}, \eqn{\{2, 12.5\}}, \eqn{\{3, 12.5\}},
+#' \eqn{\{4, 12.5\}}.
+#' For brevity, we let \eqn{v_{io}}{vio} denote the number for the
+#' objective \eqn{o} from the i'th sequence (e.g,. the number for the
+#' third objective in the first combination would be
+#' \eqn{v_{12} = 7.5}{v12 = 7.5}).
+#' Given this, the approach involves formulating an optimization problem
+#' based on each combination of numbers and solving it.
+#'
+#' Problem based on first combination:
+#' \deqn{
+#' \mathit{Maximize} \space f_1(x) \\
+#' \mathit{subject \space to \space} x \in S \\
+#' f_2(x) >= v_{11}, \\
+#' f_3(x) >= v_{12}, \\
+#' }{
+#' Maximize f1(x) subject to x in S, f2(x) >= v11, f3(x) >= v12
+#' }
+#'
+#' Problem based on second combination:
+#' \deqn{
+#' \mathit{Maximize} \space f_1(x) \\
+#' \mathit{subject \space to \space} x \in S \\
+#' f_2(x) >= v_{21}, \\
+#' f_3(x) >= v_{22}, \\
+#' }{
+#' Maximize f1(x) subject to x in S, f2(x) >= v21, f3(x) >= v22
+#' }
+#'
+#' Problem based on third combination:
+#' \deqn{
+#' \mathit{Maximize} \space f_1(x) \\
+#' \mathit{subject \space to \space} x \in S \\
+#' f_2(x) >= v_{31}, \\
+#' f_3(x) >= v_{32}, \\
+#' }{
+#' Maximize f1(x) subject to x in S, f2(x) >= v31, f3(x) >= v32
+#' }
+
+#' Problem based on i'th combination:
+#' \deqn{
+#' \mathit{Maximize} \space f_1(x) \\
+#' \mathit{subject \space to \space} x \in S \\
+#' f_2(x) >= v_{i1}, \\
+#' f_3(x) >= v_{i2}, \\
+#' }{
+#' Maximize f1(x) subject to x in S, f2(x) >= vi1, f3(x) >= vi2
+#' }
+#'
+#' In this manner, the approach sequentially formulated and solves optimization
+#' problems until it has attempted to generate a solution for each
+#' combination of numbers. The resulting set of solutions represent varying
+#' degrees of compromise between different objectives.
+#' Note that because it may be impossible to generate
+#' a solution for some combinations of numbers, this approach may not
+#' actually generate a solution each and every combination.
+#' Finally, the approach then returns all of the solutions
+#' that were successfully generated (including the extreme points).
 #'
 #' @return
 #' An updated [prioritizr::multi_problem()] object with the approach
@@ -32,6 +185,14 @@ NULL
 #'
 #' @seealso
 #' See [prioritizr::approaches] for other functions for adding an approach.
+#'
+#' @references
+#' Das I and Dennis JE (1997) A closer look at drawbacks of minimizing weighted
+#' sums of objectives for Pareto set generation in multicriteria optimization
+#' problems. _Structural Optimization_, 14: 63--69.
+#'
+#' Eichfelder G (2008) _Adaptive Scalarization Methods in Multiobjective
+#' Optimization_. Springer Berlin Heidelberg.
 #'
 #' @examplesIf prioritizr::do_run_example()
 #' # in this example, we aim to identify a set of planning units that will
@@ -72,7 +233,7 @@ NULL
 #' # degree of trade-offs between these objectives
 #' mp <-
 #'   multi_problem(keystone_obj = p1, iconic_obj = p2) %>%
-#'   add_epconstraint_approach(n_per_problem = 4, verbose = TRUE) %>%
+#'   add_eps_constraint_approach(n_per_problem = 4, verbose = TRUE) %>%
 #'   add_default_solver(gap = 0, verbose = FALSE)
 #'
 #' # solve problem
@@ -110,7 +271,7 @@ NULL
 #' )
 #'
 #' @export
-add_epconstraint_approach <- function(x, n_per_problem, verbose = TRUE) {
+add_eps_constraint_approach <- function(x, n_per_problem, verbose = TRUE) {
   # assert arguments are valid,
   assert_required(x)
   assert_required(n_per_problem)

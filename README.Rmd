@@ -4,13 +4,16 @@ output:
     html_preview: no
 ---
 
-```{r, include = FALSE}
+```{r "knitr-config", include = FALSE}
+# set parameters for figure sizes
+h <- 4.5
+w <- 6.5
+ow <- "500"
 knitr::opts_chunk$set(
-  fig.path = "man/figures/README-",
-  fig.align = "center",
-  fig.height = 4.5,
-  fig.width = 4.5,
-  dev = "ragg_png"
+  fig.height = h,
+  fig.width = w,
+  out.width = ow,
+  fig.path = "man/figures/README-", fig.align = "center"
 )
 ```
 
@@ -44,20 +47,6 @@ print <- function(x, ...) {
     base::print(x)
   }
 }
-```
-
-```{r "knitr-config", include = FALSE}
-# set parameters for figure sizes
-h <- 4.5
-w <- 6.5
-ow <- "500"
-is_github_readme <- isTRUE(knitr::pandoc_to()[[1]] %in% c("gfm", "markdown"))
-knitr::opts_chunk$set(
-  fig.height = h,
-  fig.width = w,
-  out.width = ow,
-  fig.path = "man/figures/README-", fig.align = "center"
-)
 ```
 
 ### Overview
@@ -199,7 +188,7 @@ mp <-
     public_interest_species = p2,
     vulnerable_carbon = p3
   ) %>%
-  add_epconstraint_approach(n_per_problem = 3, verbose = TRUE) %>%
+  add_eps_constraint_approach(n_per_problem = 3, verbose = TRUE) %>%
   add_default_solver(verbose = FALSE)
 
 # print multi-objective problem

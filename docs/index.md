@@ -334,7 +334,7 @@ mp <-
     public_interest_species = p2,
     vulnerable_carbon = p3
   ) %>%
-  add_epconstraint_approach(n_per_problem = 3, verbose = TRUE) %>%
+  add_eps_constraint_approach(n_per_problem = 3, verbose = TRUE) %>%
   add_default_solver(verbose = FALSE)
 
 # print multi-objective problem

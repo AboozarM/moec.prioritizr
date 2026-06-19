@@ -1,4 +1,4 @@
-# moec.prioritizr: Multi-objective prioritization with the epsilon-constraint approach
+# moec.prioritizr: Multi-Objective Prioritization with the Epsilon-Constraint Approach
 
 Systematic conservation planning is a framework to identify priority
 areas for conservation management (Giakoumi et al. 2025). Briefly,

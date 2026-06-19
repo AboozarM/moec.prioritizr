@@ -18,7 +18,7 @@ test_that("two objectives", {
         prioritizr::add_max_wtd_sum_objective(budget = 2) %>%
         prioritizr::add_binary_decisions()
     ) %>%
-    add_epconstraint_approach(n = 1, verbose = FALSE) %>%
+    add_eps_constraint_approach(n = 1, verbose = FALSE) %>%
     prioritizr::add_default_solver(gap = 0, verbose = FALSE)
   # solve problem
   s <- solve(p, run_checks = FALSE)
@@ -80,7 +80,7 @@ test_that("three objectives", {
         prioritizr::add_max_wtd_sum_objective(budget = 2) %>%
         prioritizr::add_binary_decisions()
     ) %>%
-    add_epconstraint_approach(n = 1, verbose = FALSE) %>%
+    add_eps_constraint_approach(n = 1, verbose = FALSE) %>%
     prioritizr::add_default_solver(gap = 0, verbose = FALSE)
   # solve problem
   s <- solve(p, run_checks = FALSE)
@@ -145,7 +145,7 @@ test_that("multiple solutions", {
         prioritizr::add_max_wtd_sum_objective(budget = 2) %>%
         prioritizr::add_binary_decisions()
     ) %>%
-    add_epconstraint_approach(n = 3, verbose = FALSE) %>%
+    add_eps_constraint_approach(n = 3, verbose = FALSE) %>%
     prioritizr::add_default_solver(gap = 0, verbose = FALSE)
   # solve problem
   s <- solve(p, run_checks = FALSE)

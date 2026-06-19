@@ -59,7 +59,7 @@ Collate:
     'import-standalone-assertions_functions.R'
     'import-standalone-assertions_handlers.R'
     'import-standalone-assertions_class.R'
-    'add_epconstraint_approach.R'
+    'add_eps_constraint_approach.R'
     'package.R'
 Config/roxygen2/version: 8.0.0
 Config/Needs/website:
