@@ -1,4 +1,4 @@
-#' @include import-standalone-assertions_class.R import-standalone-assertions_handlers.R import-standalone-assertions_functions.R import-standalone-assertions_misc.R import-standalone-cli.R
+#' @include import-standalone-assertions_class.R import-standalone-assertions_handlers.R import-standalone-assertions_functions.R import-standalone-assertions_misc.R import-standalone-cli.R import-standalone-as_Matrix.R which_hier_best_match.R is_rhs_potentially_feasible.R
 NULL
 
 #' Add epsilon constraint approach
@@ -131,42 +131,42 @@ NULL
 #'
 #' Problem based on first combination:
 #' \deqn{
-#' \mathit{Maximize} \space f_1(x) \\
+#' \mathit{Maximize} \space f_1(x), f_2(x), f_3(x) \\
 #' \mathit{subject \space to \space} x \in S \\
 #' f_2(x) >= v_{11}, \\
 #' f_3(x) >= v_{12}, \\
 #' }{
-#' Maximize f1(x) subject to x in S, f2(x) >= v11, f3(x) >= v12
+#' Maximize f1(x), f2(x), f3(x) subject to x in S, f2(x) >= v11, f3(x) >= v12
 #' }
 #'
 #' Problem based on second combination:
 #' \deqn{
-#' \mathit{Maximize} \space f_1(x) \\
+#' \mathit{Maximize} \space f_1(x), f_2(x), f_3(x) \\
 #' \mathit{subject \space to \space} x \in S \\
 #' f_2(x) >= v_{21}, \\
 #' f_3(x) >= v_{22}, \\
 #' }{
-#' Maximize f1(x) subject to x in S, f2(x) >= v21, f3(x) >= v22
+#' Maximize f1(x), f2(x), f3(x) subject to x in S, f2(x) >= v21, f3(x) >= v22
 #' }
 #'
 #' Problem based on third combination:
 #' \deqn{
-#' \mathit{Maximize} \space f_1(x) \\
+#' \mathit{Maximize} \space f_1(x), f_2(x), f_3(x) \\
 #' \mathit{subject \space to \space} x \in S \\
 #' f_2(x) >= v_{31}, \\
 #' f_3(x) >= v_{32}, \\
 #' }{
-#' Maximize f1(x) subject to x in S, f2(x) >= v31, f3(x) >= v32
+#' Maximize f1(x), f2(x), f3(x) subject to x in S, f2(x) >= v31, f3(x) >= v32
 #' }
 
 #' Problem based on i'th combination:
 #' \deqn{
-#' \mathit{Maximize} \space f_1(x) \\
+#' \mathit{Maximize} \space f_1(x), f_2(x), f_3(x) \\
 #' \mathit{subject \space to \space} x \in S \\
 #' f_2(x) >= v_{i1}, \\
 #' f_3(x) >= v_{i2}, \\
 #' }{
-#' Maximize f1(x) subject to x in S, f2(x) >= vi1, f3(x) >= vi2
+#' Maximize f1(x), f2(x), f3(x) subject to x in S, f2(x) >= vi1, f3(x) >= vi2
 #' }
 #'
 #' In this manner, the approach sequentially formulated and solves optimization
@@ -302,10 +302,17 @@ add_eps_constraint_approach <- function(x, n_per_problem, verbose = TRUE) {
           ## preliminary calculations
           n_obj <- nrow(x$obj)
           n_constraints <- length(x$opt$rhs())
-          n <- n_obj + (n_per_problem^(n_obj - 1))
+          n <- n_obj + (n_per_problem^(n_obj - 1L))
           sols <- vector(mode = "list", length = n)
+          inf_rhs <- matrix(ncol = n_obj - 1L, nrow = 0)
+
+          ## prepare model components
           x_obj <- x$obj
           x_modelsense <- x$modelsense
+          x_constraint_sense <- rep(">=", n_obj - 1L)
+          x_constraint_sense[x_modelsense[seq(2L, n_obj)] == "min"] <- "<="
+          x_constraint_A <-
+            as_Matrix(x$obj[seq(2L, n_obj), , drop = FALSE], "dgCMatrix")
 
           ## if needed, set up progress bar
           if (isTRUE(verbose)) {
@@ -343,7 +350,7 @@ add_eps_constraint_approach <- function(x, n_per_problem, verbose = TRUE) {
             function(i) sols[[i]]$objective[rownames(x_obj)]
           )
 
-          ## calculate right-hand-side value for epsilon constraints
+          ## calculate set of right-hand-side values for each objective
           epsilon_rhs <- vapply(
             seq(2L, n_obj), FUN.VALUE = numeric(n_per_problem),
             function(j) {
@@ -359,80 +366,92 @@ add_eps_constraint_approach <- function(x, n_per_problem, verbose = TRUE) {
           if (!is.matrix(epsilon_rhs)) {
             epsilon_rhs <- matrix(epsilon_rhs, nrow = 1)
           }
-          epsilon_rhs <- do.call(
-            what = expand.grid,
-            args = as.list(as.data.frame(epsilon_rhs))
+
+          ## calculate all combinations of right-hand side values,
+          ## note that we re-order the columns before doing all combinations
+          ## so that the resulting combinations are ordered according
+          ## to the priority order
+          epsilon_rhs <- epsilon_rhs[, seq(ncol(epsilon_rhs), 1L), drop = FALSE]
+          epsilon_rhs <- as.matrix(
+              do.call(
+              what = expand.grid,
+              args = as.list(as.data.frame(epsilon_rhs))
+            )
           )
+          epsilon_rhs <- epsilon_rhs[, seq(ncol(epsilon_rhs), 1L), drop = FALSE]
 
           ## generate remaining solutions
           for (i in seq_len(nrow(epsilon_rhs))) {
-            ### solve the optimization for the primary objective
-            ### modify problem to solve with primary objective
-            x$opt$set_modelsense(x_modelsense[[1]])
-            x$opt$set_obj(x$obj[1, ])
-            #### add in the linear constraints
-            for (j in seq(2L, n_obj)) {
-              ### add linear constraint with right-hand-side value
-              x$opt$append_linear_constraints(
-                rhs = epsilon_rhs[i, j - 1L],
-                sense = ifelse(x_modelsense[[j]] == "min", "<=", ">="),
-                A = Matrix::sparseMatrix(
-                  i = rep(1, ncol(x$obj)),
-                  j = seq_len(ncol(x$obj)),
-                  x = x$obj[j, ],
-                  dims = c(1, ncol(x$obj))
-                ),
-                row_ids = "mobj"
+            ### identify if the current set of right-hand-side values
+            ### will lead to infeasibility, because they are more
+            ### strict then a previously analyzed set of right-hand-side
+            ### values that resulted in infeasibility
+            if (
+              is_rhs_potentially_feasible(
+                epsilon_rhs[i, , drop = FALSE],
+                x_constraint_sense,
+                inf_rhs
               )
+            ) {
+              ### if i'th set of right-hand-side values could potentially
+              ### result in feasible solution, then try generating a solution...
+
+              ### modify problem by adding in the linear constraints
+              ### for the i'th set of right-hand-side values
+              x$opt$append_linear_constraints(
+                rhs = epsilon_rhs[i, ],
+                sense = x_constraint_sense,
+                A = x_constraint_A,
+                row_ids = rep("mobj", n_obj - 1L)
+              )
+              ### generate solution with hierarchical optimization,
+              ### note we use hierarchical optimization to account for
+              ### each and every objective since there may exist
+              ### multiple optimal solutions for higher ordered objectives
+              sols[[i + n_obj]] <- solver$solve_multiobj(
+                x,
+                priority = seq(n_obj, 1L),
+                rel_tol = rep(0, n_obj - 1L)
+              )
+              ### reset problem for next iteration
+              for (j in seq_len(length(x$opt$rhs()) - n_constraints)) {
+                x$opt$remove_last_linear_constraint()
+              }
+              ### if problem was infeasible, then store the rhs values
+              if (!is_valid_raw_solution(sols[[i + n_obj]], multiple = FALSE)) {
+                inf_rhs <- rbind(inf_rhs, epsilon_rhs[i, , drop = FALSE])
+              }
+            } else {
+              ### otherwise, if right-hand-side values won't result
+              ### in a feasible solution, then assign a dummy infeasible
+              ### solution as a place-holder value
+              sols[[i + n_obj]] <- list(x = NULL)
             }
-            ### solve problem
-            temp_sol <- solver$solve(x$opt)
-            ### if possible, update the starting solution for the solver
-            solver$set_start_solution(temp_sol$x, warn = FALSE)
-            ### perform tie-breaking runs
-            #### add constraint based on the obj value for the primary run
-            x$opt$append_linear_constraints(
-              rhs = sum(x$obj[1, ] * temp_sol$x),
-              sense = ifelse(x$modelsense[[1]] == "min", "<=", ">="),
-              A = Matrix::sparseMatrix(
-                i = rep(1, ncol(x$obj)),
-                j = seq_len(ncol(x$obj)),
-                x = x$obj[1, ],
-                dims = c(1, ncol(x$obj))
-              ),
-              row_ids = "mobj"
-            )
-            ### perform hierarchical optimization based on remaining objectives
-            for (j in seq(2L, n_obj)) {
-              ### modify problem to solve with j'th objective
-              x$opt$set_modelsense(x$modelsense[[j]])
-              x$opt$set_obj(x$obj[j, ])
-              ### solve problem
-              temp_sol <- solver$solve(x$opt)
-              ### if possible, update the starting solution for the solver
-              solver$set_start_solution(temp_sol$x, warn = FALSE)
-              ### if needed, then add constraint so that
-              ### next run will be constrained based on the j'th objective
-              if (!identical(j, n_obj)) {
-                x$opt$append_linear_constraints(
-                  rhs = sum(x$obj[j, ] * temp_sol$x),
-                  sense = ifelse(x$modelsense[[j]] == "min", "<=", ">="),
-                  A = Matrix::sparseMatrix(
-                    i = rep(1, ncol(x$obj)),
-                    j = seq_len(ncol(x$obj)),
-                    x = x$obj[j, ],
-                    dims = c(1, ncol(x$obj))
-                  ),
-                  row_ids = "tbobj"
+
+            ### if needed, update starting solution
+            if (!identical(i, nrow(epsilon_rhs))) {
+              ### identify which previous runs generated solutions
+              idx <- which(
+                !vapply(
+                  sols[seq(n_obj + 1, n_obj + i)],
+                  function(x) is.null(x$x), logical(1)
+                )
+              )
+              ### if any previous runs generated solutions...
+              if (length(idx) > 0) {
+                ### identify starting solution for next run
+                j <- which_hier_best_match(
+                  epsilon_rhs[i + 1, , drop = FALSE],
+                  epsilon_rhs[idx, , drop = FALSE]
+                )
+                ### if valid starting solution found, update solver
+                solver$set_start_solution(
+                  sols[[n_obj + idx[j]]]$x,
+                  warn = FALSE
                 )
               }
             }
-            ### store the resulting solution as the extreme point
-            sols[[i + n_obj]] <- temp_sol
-            ### reset problem for next iteration
-            for (i in seq_len(length(x$opt$rhs()) - n_constraints)) {
-              x$opt$remove_last_linear_constraint()
-            }
+
             ### if needed, update progress bar
             if (isTRUE(verbose)) {
               cli::cli_progress_update(id = pb)
@@ -444,7 +463,7 @@ add_eps_constraint_approach <- function(x, n_per_problem, verbose = TRUE) {
             cli::cli_progress_done(id = pb)
           }
 
-          ## if neeeded, remove infeasible solutions
+          ## if needed, remove infeasible solutions
           is_valid <- !vapply(sols, function(x) is.null(x$x), logical(1))
           sols <- sols[is_valid]
           assert(

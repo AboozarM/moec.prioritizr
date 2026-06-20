@@ -128,19 +128,20 @@ first combination would be \\v\_{12} = 7.5\\). Given this, the approach
 involves formulating an optimization problem based on each combination
 of numbers and solving it.
 
-Problem based on first combination: \$\$ \mathit{Maximize} \space f_1(x)
-\\ \mathit{subject \space to \space} x \in S \\ f_2(x) \>= v\_{11}, \\
-f_3(x) \>= v\_{12}, \\ \$\$
+Problem based on first combination: \$\$ \mathit{Maximize} \space
+f_1(x), f_2(x), f_3(x) \\ \mathit{subject \space to \space} x \in S \\
+f_2(x) \>= v\_{11}, \\ f_3(x) \>= v\_{12}, \\ \$\$
 
 Problem based on second combination: \$\$ \mathit{Maximize} \space
-f_1(x) \\ \mathit{subject \space to \space} x \in S \\ f_2(x) \>=
-v\_{21}, \\ f_3(x) \>= v\_{22}, \\ \$\$
+f_1(x), f_2(x), f_3(x) \\ \mathit{subject \space to \space} x \in S \\
+f_2(x) \>= v\_{21}, \\ f_3(x) \>= v\_{22}, \\ \$\$
 
-Problem based on third combination: \$\$ \mathit{Maximize} \space f_1(x)
-\\ \mathit{subject \space to \space} x \in S \\ f_2(x) \>= v\_{31}, \\
-f_3(x) \>= v\_{32}, \\ \$\$ Problem based on i'th combination: \$\$
-\mathit{Maximize} \space f_1(x) \\ \mathit{subject \space to \space} x
-\in S \\ f_2(x) \>= v\_{i1}, \\ f_3(x) \>= v\_{i2}, \\ \$\$
+Problem based on third combination: \$\$ \mathit{Maximize} \space
+f_1(x), f_2(x), f_3(x) \\ \mathit{subject \space to \space} x \in S \\
+f_2(x) \>= v\_{31}, \\ f_3(x) \>= v\_{32}, \\ \$\$ Problem based on i'th
+combination: \$\$ \mathit{Maximize} \space f_1(x), f_2(x), f_3(x) \\
+\mathit{subject \space to \space} x \in S \\ f_2(x) \>= v\_{i1}, \\
+f_3(x) \>= v\_{i2}, \\ \$\$
 
 In this manner, the approach sequentially formulated and solves
 optimization problems until it has attempted to generate a solution for
@@ -219,8 +220,7 @@ mp <-
 
 # solve problem
 ms <- solve(mp)
-#> Generating solutions ■■■■■■■■■■■■■■■■                 | 3/6 |  50% | ETA: 2s
-#> Generating solutions ■■■■■■■■■■■■■■■■■■■■■            | 4/6 |  67% | ETA: 1s
+#> Generating solutions ■■■■■■■■■■■■■■■■                 | 3/6 |  50% | ETA: 1s
 #> Generating solutions ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  | 6/6 | 100% | ETA: 0s
 
 # convert solutions to a multi-layer raster object

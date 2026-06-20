@@ -177,28 +177,28 @@ Given this, the approach involves formulating an optimization problem
 based on each combination of numbers and solving it.</p>
 <p>Problem based on first combination:
 $$
-\mathit{Maximize} \space f_1(x) \\
+\mathit{Maximize} \space f_1(x), f_2(x), f_3(x) \\
 \mathit{subject \space to \space} x \in S \\
 f_2(x) &gt;= v_{11}, \\
 f_3(x) &gt;= v_{12}, \\
 $$</p>
 <p>Problem based on second combination:
 $$
-\mathit{Maximize} \space f_1(x) \\
+\mathit{Maximize} \space f_1(x), f_2(x), f_3(x) \\
 \mathit{subject \space to \space} x \in S \\
 f_2(x) &gt;= v_{21}, \\
 f_3(x) &gt;= v_{22}, \\
 $$</p>
 <p>Problem based on third combination:
 $$
-\mathit{Maximize} \space f_1(x) \\
+\mathit{Maximize} \space f_1(x), f_2(x), f_3(x) \\
 \mathit{subject \space to \space} x \in S \\
 f_2(x) &gt;= v_{31}, \\
 f_3(x) &gt;= v_{32}, \\
 $$
 Problem based on i'th combination:
 $$
-\mathit{Maximize} \space f_1(x) \\
+\mathit{Maximize} \space f_1(x), f_2(x), f_3(x) \\
 \mathit{subject \space to \space} x \in S \\
 f_2(x) &gt;= v_{i1}, \\
 f_3(x) &gt;= v_{i2}, \\
@@ -277,8 +277,7 @@ Optimization</em>. Springer Berlin Heidelberg.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># solve problem</span></span></span>
 <span class="r-in"><span><span class="va">ms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/solve.html" class="external-link">solve</a></span><span class="op">(</span><span class="va">mp</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Generating solutions <span style="color: #00BB00;">■■■■■■■■■■■■■■■■                </span> | 3/6 |  50% | ETA: 2s</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Generating solutions <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■           </span> | 4/6 |  67% | ETA: 1s</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Generating solutions <span style="color: #00BB00;">■■■■■■■■■■■■■■■■                </span> | 3/6 |  50% | ETA: 1s</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Generating solutions <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ </span> | 6/6 | 100% | ETA: 0s</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># convert solutions to a multi-layer raster object</span></span></span>
