@@ -394,7 +394,7 @@ print(length(ms))
 ```
 
 ``` R
-## [1] 7
+## [1] 11
 ```
 
 ``` r
@@ -475,14 +475,18 @@ print(metric_data)
 ```
 
 ``` R
-##         name threatened_species public_interest_species vulnerable_carbon
-## 1 solution_1          0.3581032                48.35750          20.36066
-## 2 solution_2          0.3561382                51.65796          21.58850
-## 3 solution_3          0.2286733                34.95139          16.57897
-## 4 solution_4          0.2221509                50.82648          22.26093
-## 5 solution_5          0.2570307                49.14630          21.59461
-## 6 solution_6          0.3059821                50.89432          21.91841
-## 7 solution_7          0.3329506                50.81979          21.60339
+##           name threatened_species public_interest_species vulnerable_carbon
+## 1   solution_1          0.3581032                48.35750          20.36066
+## 2   solution_2          0.3561382                51.65796          21.58850
+## 3   solution_3          0.2286733                34.95139          16.57897
+## 4   solution_4          0.2206898                50.81793          22.26340
+## 5   solution_5          0.3041822                51.02351          21.93377
+## 6   solution_6          0.3328820                50.81700          21.61937
+## 7   solution_7          0.3094408                49.98532          21.61446
+## 8   solution_8          0.3352435                50.04114          21.35061
+## 9   solution_9          0.2568405                49.15617          21.59646
+## 10 solution_10          0.3026054                49.38533          21.38988
+## 11 solution_11          0.3310988                49.13349          21.02494
 ```
 
 ``` r

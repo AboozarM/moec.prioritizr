@@ -62,6 +62,7 @@
 
 # avoid false positive NOTES
 #' @importFrom terra rast
+#' @importFrom Matrix sparseMatrix
 NULL
 
 # avoid CRAN check NOTES due to R6 classes

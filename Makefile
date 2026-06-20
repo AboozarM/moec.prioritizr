@@ -77,5 +77,6 @@ update_standalone:
 	R --slave -e "usethis::use_standalone('prioritizr/prioritizr', file = 'standalone-assertions_class.R')"
 	R --slave -e "usethis::use_standalone('prioritizr/prioritizr', file = 'standalone-assertions_functions.R')"
 	R --slave -e "usethis::use_standalone('prioritizr/prioritizr', file = 'standalone-assertions_misc.R')"
+	R --slave -e "usethis::use_standalone('prioritizr/prioritizr', file = 'standalone-as_Matrix.R')"
 
 .PHONY: clean docs readme site test check checkwb build install man spellcheck examples urlcheck search_errors

@@ -141,41 +141,41 @@ based on each combination of numbers and solving it.
 
 Problem based on first combination:
 \deqn{
-\mathit{Maximize} \space f_1(x) \\
+\mathit{Maximize} \space f_1(x), f_2(x), f_3(x) \\
 \mathit{subject \space to \space} x \in S \\
 f_2(x) >= v_{11}, \\
 f_3(x) >= v_{12}, \\
 }{
-Maximize f1(x) subject to x in S, f2(x) >= v11, f3(x) >= v12
+Maximize f1(x), f2(x), f3(x) subject to x in S, f2(x) >= v11, f3(x) >= v12
 }
 
 Problem based on second combination:
 \deqn{
-\mathit{Maximize} \space f_1(x) \\
+\mathit{Maximize} \space f_1(x), f_2(x), f_3(x) \\
 \mathit{subject \space to \space} x \in S \\
 f_2(x) >= v_{21}, \\
 f_3(x) >= v_{22}, \\
 }{
-Maximize f1(x) subject to x in S, f2(x) >= v21, f3(x) >= v22
+Maximize f1(x), f2(x), f3(x) subject to x in S, f2(x) >= v21, f3(x) >= v22
 }
 
 Problem based on third combination:
 \deqn{
-\mathit{Maximize} \space f_1(x) \\
+\mathit{Maximize} \space f_1(x), f_2(x), f_3(x) \\
 \mathit{subject \space to \space} x \in S \\
 f_2(x) >= v_{31}, \\
 f_3(x) >= v_{32}, \\
 }{
-Maximize f1(x) subject to x in S, f2(x) >= v31, f3(x) >= v32
+Maximize f1(x), f2(x), f3(x) subject to x in S, f2(x) >= v31, f3(x) >= v32
 }
 Problem based on i'th combination:
 \deqn{
-\mathit{Maximize} \space f_1(x) \\
+\mathit{Maximize} \space f_1(x), f_2(x), f_3(x) \\
 \mathit{subject \space to \space} x \in S \\
 f_2(x) >= v_{i1}, \\
 f_3(x) >= v_{i2}, \\
 }{
-Maximize f1(x) subject to x in S, f2(x) >= vi1, f3(x) >= vi2
+Maximize f1(x), f2(x), f3(x) subject to x in S, f2(x) >= vi1, f3(x) >= vi2
 }
 
 In this manner, the approach sequentially formulated and solves optimization
