@@ -428,7 +428,7 @@ metric_data$public_interest_species <- vapply(
   FUN.VALUE = numeric(1),
   function(x) {
     mean(
-      eval_target_coverage_summary(p1, x)$relative_met *
+      eval_target_coverage_summary(p2, x)$relative_met *
       100 *
       wa_attr$interest_score
     )
@@ -443,7 +443,7 @@ metric_data$vulnerable_carbon <- vapply(
   FUN.VALUE = numeric(1),
   function(x) {
     mean(
-      eval_feature_representation_summary(p1, x)$relative_held * 100
+      eval_feature_representation_summary(p3, x)$relative_held * 100
     )
   }
 )
@@ -453,17 +453,17 @@ print(metric_data)
 ```
 
     ##           name threatened_species public_interest_species vulnerable_carbon
-    ## 1   solution_1          0.3581032                48.35750          20.36066
-    ## 2   solution_2          0.3561382                51.65796          21.58850
-    ## 3   solution_3          0.2286733                34.95139          16.57897
-    ## 4   solution_4          0.2206898                50.81793          22.26340
-    ## 5   solution_5          0.3041822                51.02351          21.93377
-    ## 6   solution_6          0.3328820                50.81700          21.61937
-    ## 7   solution_7          0.3094408                49.98532          21.61446
-    ## 8   solution_8          0.3352435                50.04114          21.35061
-    ## 9   solution_9          0.2568405                49.15617          21.59646
-    ## 10 solution_10          0.3026054                49.38533          21.38988
-    ## 11 solution_11          0.3310988                49.13349          21.02494
+    ## 1   solution_1          0.3581032                48.35750          15.76133
+    ## 2   solution_2          0.3561382                51.65796          15.26430
+    ## 3   solution_3          0.2286733                34.95139          23.29413
+    ## 4   solution_4          0.2206898                50.81793          21.42134
+    ## 5   solution_5          0.3041822                51.02351          19.53688
+    ## 6   solution_6          0.3328820                50.81700          17.66222
+    ## 7   solution_7          0.3094408                49.98532          19.53835
+    ## 8   solution_8          0.3352435                50.04114          17.69861
+    ## 9   solution_9          0.2568405                49.15617          21.42735
+    ## 10 solution_10          0.3026054                49.38533          19.55482
+    ## 11 solution_11          0.3310988                49.13349          17.78224
 
 ``` r
 # create plot to visualize trade-offs based on metrics

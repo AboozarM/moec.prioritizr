@@ -256,7 +256,7 @@ metric_data$public_interest_species <- vapply(
   FUN.VALUE = numeric(1),
   function(x) {
     mean(
-      eval_target_coverage_summary(p1, x)$relative_met *
+      eval_target_coverage_summary(p2, x)$relative_met *
       100 *
       wa_attr$interest_score
     )
@@ -271,7 +271,7 @@ metric_data$vulnerable_carbon <- vapply(
   FUN.VALUE = numeric(1),
   function(x) {
     mean(
-      eval_feature_representation_summary(p1, x)$relative_held * 100
+      eval_feature_representation_summary(p3, x)$relative_held * 100
     )
   }
 )

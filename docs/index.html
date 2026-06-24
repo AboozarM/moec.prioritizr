@@ -323,7 +323,7 @@
 <span>  FUN.VALUE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>,</span>
 <span>  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rspatial.github.io/terra/reference/summarize-generics.html" class="external-link">mean</a></span><span class="op">(</span></span>
-<span>      <span class="fu"><a href="https://prioritizr.net/reference/eval_target_coverage_summary.html" class="external-link">eval_target_coverage_summary</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">x</span><span class="op">)</span><span class="op">$</span><span class="va">relative_met</span> <span class="op">*</span></span>
+<span>      <span class="fu"><a href="https://prioritizr.net/reference/eval_target_coverage_summary.html" class="external-link">eval_target_coverage_summary</a></span><span class="op">(</span><span class="va">p2</span>, <span class="va">x</span><span class="op">)</span><span class="op">$</span><span class="va">relative_met</span> <span class="op">*</span></span>
 <span>      <span class="fl">100</span> <span class="op">*</span></span>
 <span>      <span class="va">wa_attr</span><span class="op">$</span><span class="va">interest_score</span></span>
 <span>    <span class="op">)</span></span>
@@ -338,7 +338,7 @@
 <span>  FUN.VALUE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>,</span>
 <span>  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rspatial.github.io/terra/reference/summarize-generics.html" class="external-link">mean</a></span><span class="op">(</span></span>
-<span>      <span class="fu"><a href="https://prioritizr.net/reference/eval_feature_representation_summary.html" class="external-link">eval_feature_representation_summary</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">x</span><span class="op">)</span><span class="op">$</span><span class="va">relative_held</span> <span class="op">*</span> <span class="fl">100</span></span>
+<span>      <span class="fu"><a href="https://prioritizr.net/reference/eval_feature_representation_summary.html" class="external-link">eval_feature_representation_summary</a></span><span class="op">(</span><span class="va">p3</span>, <span class="va">x</span><span class="op">)</span><span class="op">$</span><span class="va">relative_held</span> <span class="op">*</span> <span class="fl">100</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span><span class="op">)</span></span>
@@ -346,17 +346,17 @@
 <span><span class="co"># print the metrics</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">metric_data</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb26"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="do">##           name threatened_species public_interest_species vulnerable_carbon</span></span>
-<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a><span class="do">## 1   solution_1          0.3581032                48.35750          20.36066</span></span>
-<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a><span class="do">## 2   solution_2          0.3561382                51.65796          21.58850</span></span>
-<span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a><span class="do">## 3   solution_3          0.2286733                34.95139          16.57897</span></span>
-<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a><span class="do">## 4   solution_4          0.2206898                50.81793          22.26340</span></span>
-<span id="cb26-6"><a href="#cb26-6" tabindex="-1"></a><span class="do">## 5   solution_5          0.3041822                51.02351          21.93377</span></span>
-<span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a><span class="do">## 6   solution_6          0.3328820                50.81700          21.61937</span></span>
-<span id="cb26-8"><a href="#cb26-8" tabindex="-1"></a><span class="do">## 7   solution_7          0.3094408                49.98532          21.61446</span></span>
-<span id="cb26-9"><a href="#cb26-9" tabindex="-1"></a><span class="do">## 8   solution_8          0.3352435                50.04114          21.35061</span></span>
-<span id="cb26-10"><a href="#cb26-10" tabindex="-1"></a><span class="do">## 9   solution_9          0.2568405                49.15617          21.59646</span></span>
-<span id="cb26-11"><a href="#cb26-11" tabindex="-1"></a><span class="do">## 10 solution_10          0.3026054                49.38533          21.38988</span></span>
-<span id="cb26-12"><a href="#cb26-12" tabindex="-1"></a><span class="do">## 11 solution_11          0.3310988                49.13349          21.02494</span></span></code></pre></div>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a><span class="do">## 1   solution_1          0.3581032                48.35750          15.76133</span></span>
+<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a><span class="do">## 2   solution_2          0.3561382                51.65796          15.26430</span></span>
+<span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a><span class="do">## 3   solution_3          0.2286733                34.95139          23.29413</span></span>
+<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a><span class="do">## 4   solution_4          0.2206898                50.81793          21.42134</span></span>
+<span id="cb26-6"><a href="#cb26-6" tabindex="-1"></a><span class="do">## 5   solution_5          0.3041822                51.02351          19.53688</span></span>
+<span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a><span class="do">## 6   solution_6          0.3328820                50.81700          17.66222</span></span>
+<span id="cb26-8"><a href="#cb26-8" tabindex="-1"></a><span class="do">## 7   solution_7          0.3094408                49.98532          19.53835</span></span>
+<span id="cb26-9"><a href="#cb26-9" tabindex="-1"></a><span class="do">## 8   solution_8          0.3352435                50.04114          17.69861</span></span>
+<span id="cb26-10"><a href="#cb26-10" tabindex="-1"></a><span class="do">## 9   solution_9          0.2568405                49.15617          21.42735</span></span>
+<span id="cb26-11"><a href="#cb26-11" tabindex="-1"></a><span class="do">## 10 solution_10          0.3026054                49.38533          19.55482</span></span>
+<span id="cb26-12"><a href="#cb26-12" tabindex="-1"></a><span class="do">## 11 solution_11          0.3310988                49.13349          17.78224</span></span></code></pre></div>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># create plot to visualize trade-offs based on metrics</span></span>
 <span><span class="va">p</span> <span class="op">&lt;-</span></span>
