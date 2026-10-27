@@ -92,7 +92,7 @@ print(wa_pu)
 plot(wa_pu, main = "Costs", axes = FALSE)
 ```
 
-We will also import data on existing 0rotected areas. To achieve this, we will use the `get_wa_locked_in()` function to import spatially explicit protected area data as a single-layer raster, wherein cell values denote the locations of existing protected areas (values of 1 indicate existing protected areas).
+We will also import data on existing protected areas. To achieve this, we will use the `get_wa_locked_in()` function to import spatially explicit protected area data as a single-layer raster, wherein cell values denote the locations of existing protected areas (values of 1 indicate existing protected areas).
 
 ```{r "locked-in"}
 # import existing protected area data
