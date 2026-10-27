@@ -106,7 +106,7 @@ plot(wa_pu, main = "Costs", axes = FALSE)
 
 <img src="man/figures/README-planning_units-1.png" alt="" width="500" style="display: block; margin: auto;" />
 
-We will also import data on existing 0rotected areas. To achieve this,
+We will also import data on existing protected areas. To achieve this,
 we will use the `get_wa_locked_in()` function to import spatially
 explicit protected area data as a single-layer raster, wherein cell
 values denote the locations of existing protected areas (values of 1
